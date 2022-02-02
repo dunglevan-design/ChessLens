@@ -1,12 +1,13 @@
-import { View, Text } from 'react-native';
-import React from 'react';
+import React, { useState } from 'react';
 
 const useAuth = () => {
-  return (
-    <View>
-      <Text></Text>
-    </View>
-  );
-};
+    const [user, setUser] = useState({
+        name: "",
+        id: "",
+    });
+
+
+    return user
+}
 
 export default useAuth;

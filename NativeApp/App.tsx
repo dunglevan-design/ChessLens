@@ -17,6 +17,7 @@ import {Box, extendTheme, NativeBaseProvider} from 'native-base';
 import {NavigationContainer} from '@react-navigation/native';
 import StackNavigator from './StackNavigator';
 
+
 const config = {
   useSystemColorMode: false,
   initialColorMode: 'dark',

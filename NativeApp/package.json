@@ -12,7 +12,10 @@
   "dependencies": {
     "@react-navigation/native": "^6.0.7",
     "@react-navigation/native-stack": "^6.3.0",
+    "base64url": "^3.0.1",
+    "expo-web-browser": "^10.1.1",
     "native-base": "^3.3.4",
+    "randomstring": "^1.2.2",
     "react": "17.0.2",
     "react-native": "0.67.1",
     "react-native-gesture-handler": "^2.2.0",
