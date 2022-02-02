@@ -1,10 +1,10 @@
 import { View, Text } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import useAuth from '../../hooks/useAuth';
-var crypto = require("crypto");
-var randomstring = require("randomstring");
+import Constants from 'expo-constants';
 
 
+console.log(Constants.systemFonts);
 const Authcontext = React.createContext({
     user: null,
     LoginWithLichess: () => {},

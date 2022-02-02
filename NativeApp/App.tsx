@@ -7,16 +7,14 @@
  *
  * @format
  */
-import React from "react";
+import React from 'react';
 import 'react-native-gesture-handler';
-import {
-  gestureHandlerRootHOC,
-} from 'react-native-gesture-handler';
+import {gestureHandlerRootHOC} from 'react-native-gesture-handler';
 
 import {Box, extendTheme, NativeBaseProvider} from 'native-base';
 import {NavigationContainer} from '@react-navigation/native';
 import StackNavigator from './StackNavigator';
-
+import AuthContext from './components/ContextProviders/AuthContext';
 
 const config = {
   useSystemColorMode: false,
@@ -29,7 +27,9 @@ const App = gestureHandlerRootHOC(() => {
   return (
     <NavigationContainer>
       <NativeBaseProvider theme={Theme}>
-        <StackNavigator />
+        <AuthContext>
+          <StackNavigator />
+        </AuthContext>
       </NativeBaseProvider>
     </NavigationContainer>
   );

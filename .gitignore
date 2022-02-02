@@ -1,42 +1,42 @@
 # OSX
 #
-NativeApp/.DS_Store
+nativeappreact/.DS_Store
 # Xcode
 #
-NativeApp/build/
+nativeappreact/build/
 *.pbxuser
-!NativeApp/default.pbxuser
+!nativeappreact/default.pbxuser
 *.mode1v3
-!NativeApp/default.mode1v3
+!nativeappreact/default.mode1v3
 *.mode2v3
-!NativeApp/default.mode2v3
+!nativeappreact/default.mode2v3
 *.perspectivev3
-!NativeApp/default.perspectivev3
-NativeApp/xcuserdata
+!nativeappreact/default.perspectivev3
+nativeappreact/xcuserdata
 *.xccheckout
 *.moved-aside
-NativeApp/DerivedData
+nativeappreact/DerivedData
 *.hmap
 *.ipa
 *.xcuserstate
 
 # Android/IntelliJ
 #
-NativeApp/build/
-NativeApp/.idea
-NativeApp/.gradle
-NativeApp/local.properties
+nativeappreact/android/build/
+nativeappreact/andoird/.idea
+nativeappreact/android/.gradle
+nativeappreact/android/local.properties
 *.iml
 *.hprof
 
 # node.js
 #
-NativeApp/node_modules/
-NativeApp/npm-debug.log
-NativeApp/yarn-error.log
+nativeappreact/node_modules/
+nativeappreact/npm-debug.log
+nativeappreact/yarn-error.log
 
 # BUCK
-NativeApp/buck-out/
+nativeappreact/buck-out/
 \.buckd/
 *.keystore
 
@@ -55,4 +55,4 @@ NativeApp/buck-out/
 *.jsbundle
 
 # CocoaPods
-NativeApp/ios/Pods/
+nativeappreact/ios/Pods/

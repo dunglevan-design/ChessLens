@@ -13,7 +13,7 @@
     "@react-navigation/native": "^6.0.7",
     "@react-navigation/native-stack": "^6.3.0",
     "base64url": "^3.0.1",
-    "expo-web-browser": "^10.1.1",
+    "expo": "^44.0.6",
     "native-base": "^3.3.4",
     "randomstring": "^1.2.2",
     "react": "17.0.2",
@@ -24,7 +24,8 @@
     "react-native-screens": "^3.10.2",
     "react-native-svg": "^12.1.0",
     "react-native-vision-camera": "^2.12.0",
-    "vision-camera-image-labeler": "^0.1.6"
+    "vision-camera-image-labeler": "^0.1.6",
+    "expo-constants": "~13.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
