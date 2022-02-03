@@ -4,7 +4,7 @@ import { CryptoDigestAlgorithm } from "expo-crypto";
 
 const Authcontext = React.createContext({
   user: null,
-  LoginWithLichess: async() => {},
+  LoginWithLichess: async () => {},
   Logout: () => {},
 });
 
