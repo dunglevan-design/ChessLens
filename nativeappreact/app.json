@@ -2,7 +2,7 @@
   "expo": {
     "name": "nativeappreact",
     "slug": "nativeappreact",
-    "scheme": "nativeappreact",
+    "scheme": "com.nativeappreact",
     "version": "1.0.0",
     "assetBundlePatterns": [
       "**/*"
