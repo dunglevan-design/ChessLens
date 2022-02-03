@@ -10,7 +10,7 @@ import StackNavigator from "./components/StackNavigator";
 
 import * as Linking from "expo-linking";
 
-const prefix = Linking.createURL("path");
+const prefix = Linking.createURL("app");
 
 export default function App() {
   const linking = {

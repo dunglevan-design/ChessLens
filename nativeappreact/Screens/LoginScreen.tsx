@@ -7,7 +7,7 @@ const LoginScreen = () => {
   const {LoginWithLichess} = useAuth();
 
   const Testlinking = async() => {
-      const linkurl = "com.nativeappreact://path/home";
+      const linkurl = "com.nativeappreact://app/home";
       console.log(await Linking.openURL(linkurl));
   }
   return (

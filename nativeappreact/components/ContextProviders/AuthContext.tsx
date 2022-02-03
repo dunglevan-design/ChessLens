@@ -1,8 +1,9 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useRef, useState } from "react";
 import * as Crypto from "expo-crypto";
 import { CryptoDigestAlgorithm } from "expo-crypto";
 import * as WebBrowser from "expo-web-browser";
 import * as Linking from "expo-linking";
+import { Alert } from "react-native";
 
 const Authcontext = React.createContext({
   user: null,
@@ -16,20 +17,67 @@ const AuthContext: React.FC = ({ children }) => {
   const [user, setUser] = useState({
     name: "",
     id: "",
+    accessToken: "",
   });
+  const authstate = useRef("");
+  const code_verifier = useRef("");
 
-  const HandleRedirect = (e) => {
-    console.log("e: >>>", e);
+  const RequestAccessToken = async (code) => {
+    let headersList = {
+      Accept: "*/*",
+      "Content-Type": "application/json",
+    };
+
+    let bodyContent = JSON.stringify({
+      grant_type: "authorization_code",
+      code: code,
+      code_verifier: code_verifier,
+      redirect_uri: "com.nativeappreact://app/home",
+      client_id: "nativeappreact",
+    });
+
+    console.log("lol wtf");
+
+    try {
+      const response = await fetch("https://lichess.org/api/token", {
+        method: "POST",
+        body: bodyContent,
+        headers: headersList,
+      });
+      console.log(response);
+      const data = await response.json();
+      console.log(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const HandleRedirect = async (url) => {
+    console.log("url: >>>", url);
     // WebBrowser.dismissAuthSession();
-    let data = Linking.parse(e);
+    let data: Linking.ParsedURL = Linking.parse(url.url);
     console.log("data: >>>", data);
+
+    const { queryParams } = data;
+    const { code, state } = queryParams;
+
+    Linking.removeEventListener("url", HandleRedirect);
+    if (state === authstate.current) {
+      try {
+        console.log("requesting token");
+        await RequestAccessToken(code);
+      } catch (error) {
+        console.log(error);
+        Alert.alert("Chesslense: ", error);
+      }
+    }
   };
 
   const LoginWithLichess = async () => {
     //trigger webbrowser login PKCE flow
     console.log("sign in with Lichess");
     //Create credentials: code challenge, state etc.
-    const code_verifier = Array(128)
+    code_verifier.current = Array(128)
       .fill("0")
       .map(() =>
         "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".charAt(
@@ -37,10 +85,10 @@ const AuthContext: React.FC = ({ children }) => {
         )
       )
       .join("");
-    console.log(code_verifier);
+    console.log(code_verifier.current);
     const digest = await Crypto.digestStringAsync(
       CryptoDigestAlgorithm.SHA256,
-      code_verifier,
+      code_verifier.current,
       {
         encoding: Crypto.CryptoEncoding.BASE64,
       }
@@ -50,12 +98,15 @@ const AuthContext: React.FC = ({ children }) => {
       .replace(/\//g, "_")
       .replace(/=/g, "");
     console.log(code_challenge);
-    const state = 123;
+    authstate.current = Array(10)
+      .fill("0")
+      .map(() => "0123456789".charAt(Math.random() * 10))
+      .join("");
 
     //Open Auth
-    Linking.addEventListener("url", (url) => HandleRedirect(url));
+    Linking.addEventListener("url", HandleRedirect);
     WebBrowser.openAuthSessionAsync(
-      `https://lichess.org/oauth?response_type=code&client_id=nativeappreact&redirect_uri=com.nativeappreact://app/home&code_challenge_method=S256&code_challenge=${code_challenge}&state=${state}`,
+      `https://lichess.org/oauth?response_type=code&client_id=nativeappreact&redirect_uri=com.nativeappreact://app/home&code_challenge_method=S256&code_challenge=${code_challenge}&state=${authstate.current}`,
       "nativeappreact://app/game"
     );
   };
