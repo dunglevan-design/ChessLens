@@ -22,6 +22,10 @@ const AuthContext: React.FC = ({ children }) => {
   const authstate = useRef("");
   const code_verifier = useRef("");
 
+  const GetUserData = (access_token, expires_in, token_type) => {
+    
+  }
+
   const RequestAccessToken = async (code) => {
     let headersList = {
       Accept: "*/*",
@@ -31,25 +35,22 @@ const AuthContext: React.FC = ({ children }) => {
     let bodyContent = JSON.stringify({
       grant_type: "authorization_code",
       code: code,
-      code_verifier: code_verifier,
+      code_verifier: code_verifier.current,
       redirect_uri: "com.nativeappreact://app/home",
       client_id: "nativeappreact",
     });
-
-    console.log("lol wtf");
-
-    try {
-      const response = await fetch("https://lichess.org/api/token", {
-        method: "POST",
-        body: bodyContent,
-        headers: headersList,
-      });
-      console.log(response);
-      const data = await response.json();
-      console.log(data);
-    } catch (error) {
-      console.log(error);
+    const response = await fetch("https://lichess.org/api/token", {
+      method: "POST",
+      body: bodyContent,
+      headers: headersList,
+    });
+    console.log(response.status);
+    if (response.status == 400) {
+      throw new Error("Authentication failed, server response with status 400");
     }
+    const data = await response.json();
+    const { token_type, access_token, expires_in } = data;
+    GetUserData(access_token, expires_in, token_type);
   };
 
   const HandleRedirect = async (url) => {
@@ -68,7 +69,7 @@ const AuthContext: React.FC = ({ children }) => {
         await RequestAccessToken(code);
       } catch (error) {
         console.log(error);
-        Alert.alert("Chesslense: ", error);
+        Alert.alert("Chesslense: ", error.toString());
       }
     }
   };
