@@ -56,3 +56,64 @@ nativeappreact/buck-out/
 
 # CocoaPods
 nativeappreact/ios/Pods/
+
+
+
+# OSX
+#
+NativeApp/.DS_Store
+# Xcode
+#
+NativeApp/build/
+*.pbxuser
+!NativeApp/default.pbxuser
+*.mode1v3
+!NativeApp/default.mode1v3
+*.mode2v3
+!NativeApp/default.mode2v3
+*.perspectivev3
+!NativeApp/default.perspectivev3
+NativeApp/xcuserdata
+*.xccheckout
+*.moved-aside
+NativeApp/DerivedData
+*.hmap
+*.ipa
+*.xcuserstate
+
+# Android/IntelliJ
+#
+NativeApp/android/build/
+NativeApp/andoird/.idea
+NativeApp/android/.gradle
+NativeApp/android/local.properties
+*.iml
+*.hprof
+
+# node.js
+#
+NativeApp/node_modules/
+NativeApp/npm-debug.log
+NativeApp/yarn-error.log
+
+# BUCK
+NativeApp/buck-out/
+\.buckd/
+*.keystore
+
+# fastlane
+#
+# It is recommended to not store the screenshots in the git repo. Instead, use fastlane to re-generate the
+# screenshots whenever they are needed.
+# For more information about the recommended setup visit:
+# https://docs.fastlane.tools/best-practices/source-control/
+
+*/fastlane/report.xml
+*/fastlane/Preview.html
+*/fastlane/screenshots
+
+# Bundle artifact
+*.jsbundle
+
+# CocoaPods
+NativeApp/ios/Pods/
