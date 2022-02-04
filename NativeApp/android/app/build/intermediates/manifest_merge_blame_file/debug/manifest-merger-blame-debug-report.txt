@@ -1,0 +1,238 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.nativeapp"
+4    android:versionCode="1"
+5    android:versionName="1.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="21"
+9        android:targetSdkVersion="30" />
+10
+11    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+11-->D:\Projects\ChessLens\NativeApp\android\app\src\debug\AndroidManifest.xml:5:5-77
+11-->D:\Projects\ChessLens\NativeApp\android\app\src\debug\AndroidManifest.xml:5:22-75
+12    <uses-permission android:name="android.permission.INTERNET" />
+12-->D:\Projects\ChessLens\NativeApp\android\app\src\main\AndroidManifest.xml:3:5-67
+12-->D:\Projects\ChessLens\NativeApp\android\app\src\main\AndroidManifest.xml:3:22-64
+13    <uses-permission android:name="android.permission.CAMERA" />
+13-->D:\Projects\ChessLens\NativeApp\android\app\src\main\AndroidManifest.xml:4:5-65
+13-->D:\Projects\ChessLens\NativeApp\android\app\src\main\AndroidManifest.xml:4:22-62
+14    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+14-->[com.facebook.flipper:flipper:0.99.0] C:\Users\dungl\.gradle\caches\transforms-3\df7b208c45426f45016d16c0c3a6a059\transformed\jetified-flipper-0.99.0\AndroidManifest.xml:16:5-76
+14-->[com.facebook.flipper:flipper:0.99.0] C:\Users\dungl\.gradle\caches\transforms-3\df7b208c45426f45016d16c0c3a6a059\transformed\jetified-flipper-0.99.0\AndroidManifest.xml:16:22-73
+15    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+16    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+17    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+18
+19    <queries>
+19-->[:expo-file-system] D:\Projects\ChessLens\NativeApp\node_modules\expo-file-system\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:14:5-20:15
+20
+21        <!-- Query open documents -->
+22        <intent>
+22-->[:expo-file-system] D:\Projects\ChessLens\NativeApp\node_modules\expo-file-system\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:17:9-19:18
+23            <action android:name="android.intent.action.OPEN_DOCUMENT_TREE" />
+23-->[:expo-file-system] D:\Projects\ChessLens\NativeApp\node_modules\expo-file-system\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:18:13-79
+23-->[:expo-file-system] D:\Projects\ChessLens\NativeApp\node_modules\expo-file-system\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:18:21-76
+24        </intent>
+25        <intent>
+25-->[androidx.camera:camera-extensions:1.0.0-alpha32] C:\Users\dungl\.gradle\caches\transforms-3\d9a103a907c61212f3366d6adfe941a6\transformed\jetified-camera-extensions-1.0.0-alpha32\AndroidManifest.xml:25:9-27:18
+26            <action android:name="androidx.camera.extensions.action.VENDOR_ACTION" />
+26-->[androidx.camera:camera-extensions:1.0.0-alpha32] C:\Users\dungl\.gradle\caches\transforms-3\d9a103a907c61212f3366d6adfe941a6\transformed\jetified-camera-extensions-1.0.0-alpha32\AndroidManifest.xml:26:13-86
+26-->[androidx.camera:camera-extensions:1.0.0-alpha32] C:\Users\dungl\.gradle\caches\transforms-3\d9a103a907c61212f3366d6adfe941a6\transformed\jetified-camera-extensions-1.0.0-alpha32\AndroidManifest.xml:26:21-83
+27        </intent>
+28    </queries> <!-- Although the *SdkVersion is captured in gradle build files, this is required for non gradle builds -->
+29    <!-- <uses-sdk android:minSdkVersion="14"/> -->
+30    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+30-->[com.google.android.datatransport:transport-backend-cct:2.3.3] C:\Users\dungl\.gradle\caches\transforms-3\61c4b96fd6afa09eb1be3604e1af824c\transformed\jetified-transport-backend-cct-2.3.3\AndroidManifest.xml:25:5-79
+30-->[com.google.android.datatransport:transport-backend-cct:2.3.3] C:\Users\dungl\.gradle\caches\transforms-3\61c4b96fd6afa09eb1be3604e1af824c\transformed\jetified-transport-backend-cct-2.3.3\AndroidManifest.xml:25:22-76
+31    <uses-permission android:name="com.google.android.finsky.permission.BIND_GET_INSTALL_REFERRER_SERVICE" />
+31-->[com.android.installreferrer:installreferrer:1.0] C:\Users\dungl\.gradle\caches\transforms-3\1a41ca6f2b4d66fe5f43773b34ab082a\transformed\jetified-installreferrer-1.0\AndroidManifest.xml:9:5-110
+31-->[com.android.installreferrer:installreferrer:1.0] C:\Users\dungl\.gradle\caches\transforms-3\1a41ca6f2b4d66fe5f43773b34ab082a\transformed\jetified-installreferrer-1.0\AndroidManifest.xml:9:22-107
+32
+33    <application
+33-->D:\Projects\ChessLens\NativeApp\android\app\src\main\AndroidManifest.xml:6:5-24:19
+34        android:name="com.nativeapp.MainApplication"
+34-->D:\Projects\ChessLens\NativeApp\android\app\src\main\AndroidManifest.xml:7:7-38
+35        android:allowBackup="false"
+35-->D:\Projects\ChessLens\NativeApp\android\app\src\main\AndroidManifest.xml:11:7-34
+36        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+36-->[androidx.core:core:1.6.0] C:\Users\dungl\.gradle\caches\transforms-3\9f18c6b50baa776d71894ad120630276\transformed\core-1.6.0\AndroidManifest.xml:24:18-86
+37        android:debuggable="true"
+38        android:icon="@mipmap/ic_launcher"
+38-->D:\Projects\ChessLens\NativeApp\android\app\src\main\AndroidManifest.xml:9:7-41
+39        android:label="@string/app_name"
+39-->D:\Projects\ChessLens\NativeApp\android\app\src\main\AndroidManifest.xml:8:7-39
+40        android:roundIcon="@mipmap/ic_launcher_round"
+40-->D:\Projects\ChessLens\NativeApp\android\app\src\main\AndroidManifest.xml:10:7-52
+41        android:theme="@style/AppTheme"
+41-->D:\Projects\ChessLens\NativeApp\android\app\src\main\AndroidManifest.xml:12:7-38
+42        android:usesCleartextTraffic="true" >
+42-->D:\Projects\ChessLens\NativeApp\android\app\src\debug\AndroidManifest.xml:8:9-44
+43        <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
+43-->D:\Projects\ChessLens\NativeApp\android\app\src\debug\AndroidManifest.xml:11:9-86
+43-->D:\Projects\ChessLens\NativeApp\android\app\src\debug\AndroidManifest.xml:11:19-83
+44        <activity
+44-->D:\Projects\ChessLens\NativeApp\android\app\src\main\AndroidManifest.xml:13:7-23:18
+45            android:name="com.nativeapp.MainActivity"
+45-->D:\Projects\ChessLens\NativeApp\android\app\src\main\AndroidManifest.xml:14:9-37
+46            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|uiMode"
+46-->D:\Projects\ChessLens\NativeApp\android\app\src\main\AndroidManifest.xml:16:9-86
+47            android:label="@string/app_name"
+47-->D:\Projects\ChessLens\NativeApp\android\app\src\main\AndroidManifest.xml:15:9-41
+48            android:launchMode="singleTask"
+48-->D:\Projects\ChessLens\NativeApp\android\app\src\main\AndroidManifest.xml:17:9-40
+49            android:windowSoftInputMode="adjustResize" >
+49-->D:\Projects\ChessLens\NativeApp\android\app\src\main\AndroidManifest.xml:18:9-51
+50            <intent-filter>
+50-->D:\Projects\ChessLens\NativeApp\android\app\src\main\AndroidManifest.xml:19:9-22:25
+51                <action android:name="android.intent.action.MAIN" />
+51-->D:\Projects\ChessLens\NativeApp\android\app\src\main\AndroidManifest.xml:20:13-65
+51-->D:\Projects\ChessLens\NativeApp\android\app\src\main\AndroidManifest.xml:20:21-62
+52
+53                <category android:name="android.intent.category.LAUNCHER" />
+53-->D:\Projects\ChessLens\NativeApp\android\app\src\main\AndroidManifest.xml:21:13-73
+53-->D:\Projects\ChessLens\NativeApp\android\app\src\main\AndroidManifest.xml:21:23-70
+54            </intent-filter>
+55        </activity>
+56
+57        <provider
+57-->[:expo-file-system] D:\Projects\ChessLens\NativeApp\node_modules\expo-file-system\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:23:9-32:20
+58            android:name="expo.modules.filesystem.FileSystemFileProvider"
+58-->[:expo-file-system] D:\Projects\ChessLens\NativeApp\node_modules\expo-file-system\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:24:13-74
+59            android:authorities="com.nativeapp.FileSystemFileProvider"
+59-->[:expo-file-system] D:\Projects\ChessLens\NativeApp\node_modules\expo-file-system\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:25:13-74
+60            android:exported="false"
+60-->[:expo-file-system] D:\Projects\ChessLens\NativeApp\node_modules\expo-file-system\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:26:13-37
+61            android:grantUriPermissions="true" >
+61-->[:expo-file-system] D:\Projects\ChessLens\NativeApp\node_modules\expo-file-system\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:27:13-47
+62            <meta-data
+62-->[:expo-file-system] D:\Projects\ChessLens\NativeApp\node_modules\expo-file-system\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:29:13-31:70
+63                android:name="android.support.FILE_PROVIDER_PATHS"
+63-->[:expo-file-system] D:\Projects\ChessLens\NativeApp\node_modules\expo-file-system\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:30:17-67
+64                android:resource="@xml/file_system_provider_paths" />
+64-->[:expo-file-system] D:\Projects\ChessLens\NativeApp\node_modules\expo-file-system\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:31:17-67
+65        </provider>
+66
+67        <meta-data
+67-->[:expo-modules-core] D:\Projects\ChessLens\NativeApp\node_modules\expo-modules-core\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:10:9-12:89
+68            android:name="org.unimodules.core.AppLoader#react-native-headless"
+68-->[:expo-modules-core] D:\Projects\ChessLens\NativeApp\node_modules\expo-modules-core\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:11:13-79
+69            android:value="expo.modules.adapters.react.apploader.RNHeadlessAppLoader" />
+69-->[:expo-modules-core] D:\Projects\ChessLens\NativeApp\node_modules\expo-modules-core\android\build\intermediates\merged_manifest\debug\AndroidManifest.xml:12:13-86
+70
+71        <service
+71-->[com.google.mlkit:image-labeling:17.0.5] C:\Users\dungl\.gradle\caches\transforms-3\49d60c06ff0efd563c4c919c0ef972bd\transformed\jetified-image-labeling-17.0.5\AndroidManifest.xml:8:9-14:19
+72            android:name="com.google.mlkit.common.internal.MlKitComponentDiscoveryService"
+72-->[com.google.mlkit:image-labeling:17.0.5] C:\Users\dungl\.gradle\caches\transforms-3\49d60c06ff0efd563c4c919c0ef972bd\transformed\jetified-image-labeling-17.0.5\AndroidManifest.xml:9:13-91
+73            android:directBootAware="true"
+73-->[com.google.mlkit:common:17.1.1] C:\Users\dungl\.gradle\caches\transforms-3\f1b9da7300a5c1c841980885a3f69ef4\transformed\jetified-common-17.1.1\AndroidManifest.xml:17:13-43
+74            android:exported="false" >
+74-->[com.google.mlkit:image-labeling:17.0.5] C:\Users\dungl\.gradle\caches\transforms-3\49d60c06ff0efd563c4c919c0ef972bd\transformed\jetified-image-labeling-17.0.5\AndroidManifest.xml:10:13-37
+75            <meta-data
+75-->[com.google.mlkit:image-labeling:17.0.5] C:\Users\dungl\.gradle\caches\transforms-3\49d60c06ff0efd563c4c919c0ef972bd\transformed\jetified-image-labeling-17.0.5\AndroidManifest.xml:11:13-13:85
+76                android:name="com.google.firebase.components:com.google.mlkit.vision.label.defaults.internal.BundledLabelRegistrar"
+76-->[com.google.mlkit:image-labeling:17.0.5] C:\Users\dungl\.gradle\caches\transforms-3\49d60c06ff0efd563c4c919c0ef972bd\transformed\jetified-image-labeling-17.0.5\AndroidManifest.xml:12:17-132
+77                android:value="com.google.firebase.components.ComponentRegistrar" />
+77-->[com.google.mlkit:image-labeling:17.0.5] C:\Users\dungl\.gradle\caches\transforms-3\49d60c06ff0efd563c4c919c0ef972bd\transformed\jetified-image-labeling-17.0.5\AndroidManifest.xml:13:17-82
+78            <meta-data
+78-->[com.google.mlkit:vision-internal-vkp:18.1.1] C:\Users\dungl\.gradle\caches\transforms-3\8766dcc359aa224fde5aec536b9ca3cc\transformed\jetified-vision-internal-vkp-18.1.1\AndroidManifest.xml:11:13-13:85
+79                android:name="com.google.firebase.components:com.google.mlkit.vision.vkp.VkpRegistrar"
+79-->[com.google.mlkit:vision-internal-vkp:18.1.1] C:\Users\dungl\.gradle\caches\transforms-3\8766dcc359aa224fde5aec536b9ca3cc\transformed\jetified-vision-internal-vkp-18.1.1\AndroidManifest.xml:12:17-103
+80                android:value="com.google.firebase.components.ComponentRegistrar" />
+80-->[com.google.mlkit:vision-internal-vkp:18.1.1] C:\Users\dungl\.gradle\caches\transforms-3\8766dcc359aa224fde5aec536b9ca3cc\transformed\jetified-vision-internal-vkp-18.1.1\AndroidManifest.xml:13:17-82
+81            <meta-data
+81-->[com.google.mlkit:vision-common:16.5.0] C:\Users\dungl\.gradle\caches\transforms-3\55078cb985f852d16383fc5044498b4c\transformed\jetified-vision-common-16.5.0\AndroidManifest.xml:12:13-14:85
+82                android:name="com.google.firebase.components:com.google.mlkit.vision.common.internal.VisionCommonRegistrar"
+82-->[com.google.mlkit:vision-common:16.5.0] C:\Users\dungl\.gradle\caches\transforms-3\55078cb985f852d16383fc5044498b4c\transformed\jetified-vision-common-16.5.0\AndroidManifest.xml:13:17-124
+83                android:value="com.google.firebase.components.ComponentRegistrar" />
+83-->[com.google.mlkit:vision-common:16.5.0] C:\Users\dungl\.gradle\caches\transforms-3\55078cb985f852d16383fc5044498b4c\transformed\jetified-vision-common-16.5.0\AndroidManifest.xml:14:17-82
+84            <meta-data
+84-->[com.google.mlkit:common:17.1.1] C:\Users\dungl\.gradle\caches\transforms-3\f1b9da7300a5c1c841980885a3f69ef4\transformed\jetified-common-17.1.1\AndroidManifest.xml:20:13-22:85
+85                android:name="com.google.firebase.components:com.google.mlkit.common.internal.CommonComponentRegistrar"
+85-->[com.google.mlkit:common:17.1.1] C:\Users\dungl\.gradle\caches\transforms-3\f1b9da7300a5c1c841980885a3f69ef4\transformed\jetified-common-17.1.1\AndroidManifest.xml:21:17-120
+86                android:value="com.google.firebase.components.ComponentRegistrar" />
+86-->[com.google.mlkit:common:17.1.1] C:\Users\dungl\.gradle\caches\transforms-3\f1b9da7300a5c1c841980885a3f69ef4\transformed\jetified-common-17.1.1\AndroidManifest.xml:22:17-82
+87        </service>
+88
+89        <provider
+89-->[com.google.mlkit:common:17.1.1] C:\Users\dungl\.gradle\caches\transforms-3\f1b9da7300a5c1c841980885a3f69ef4\transformed\jetified-common-17.1.1\AndroidManifest.xml:9:9-13:38
+90            android:name="com.google.mlkit.common.internal.MlKitInitProvider"
+90-->[com.google.mlkit:common:17.1.1] C:\Users\dungl\.gradle\caches\transforms-3\f1b9da7300a5c1c841980885a3f69ef4\transformed\jetified-common-17.1.1\AndroidManifest.xml:10:13-78
+91            android:authorities="com.nativeapp.mlkitinitprovider"
+91-->[com.google.mlkit:common:17.1.1] C:\Users\dungl\.gradle\caches\transforms-3\f1b9da7300a5c1c841980885a3f69ef4\transformed\jetified-common-17.1.1\AndroidManifest.xml:11:13-69
+92            android:exported="false"
+92-->[com.google.mlkit:common:17.1.1] C:\Users\dungl\.gradle\caches\transforms-3\f1b9da7300a5c1c841980885a3f69ef4\transformed\jetified-common-17.1.1\AndroidManifest.xml:12:13-37
+93            android:initOrder="99" />
+93-->[com.google.mlkit:common:17.1.1] C:\Users\dungl\.gradle\caches\transforms-3\f1b9da7300a5c1c841980885a3f69ef4\transformed\jetified-common-17.1.1\AndroidManifest.xml:13:13-35
+94
+95        <service
+95-->[com.google.android.datatransport:transport-backend-cct:2.3.3] C:\Users\dungl\.gradle\caches\transforms-3\61c4b96fd6afa09eb1be3604e1af824c\transformed\jetified-transport-backend-cct-2.3.3\AndroidManifest.xml:29:9-35:19
+96            android:name="com.google.android.datatransport.runtime.backends.TransportBackendDiscovery"
+96-->[com.google.android.datatransport:transport-backend-cct:2.3.3] C:\Users\dungl\.gradle\caches\transforms-3\61c4b96fd6afa09eb1be3604e1af824c\transformed\jetified-transport-backend-cct-2.3.3\AndroidManifest.xml:30:13-103
+97            android:exported="false" >
+97-->[com.google.android.datatransport:transport-backend-cct:2.3.3] C:\Users\dungl\.gradle\caches\transforms-3\61c4b96fd6afa09eb1be3604e1af824c\transformed\jetified-transport-backend-cct-2.3.3\AndroidManifest.xml:31:13-37
+98            <meta-data
+98-->[com.google.android.datatransport:transport-backend-cct:2.3.3] C:\Users\dungl\.gradle\caches\transforms-3\61c4b96fd6afa09eb1be3604e1af824c\transformed\jetified-transport-backend-cct-2.3.3\AndroidManifest.xml:32:13-34:39
+99                android:name="backend:com.google.android.datatransport.cct.CctBackendFactory"
+99-->[com.google.android.datatransport:transport-backend-cct:2.3.3] C:\Users\dungl\.gradle\caches\transforms-3\61c4b96fd6afa09eb1be3604e1af824c\transformed\jetified-transport-backend-cct-2.3.3\AndroidManifest.xml:33:17-94
+100                android:value="cct" />
+100-->[com.google.android.datatransport:transport-backend-cct:2.3.3] C:\Users\dungl\.gradle\caches\transforms-3\61c4b96fd6afa09eb1be3604e1af824c\transformed\jetified-transport-backend-cct-2.3.3\AndroidManifest.xml:34:17-36
+101        </service>
+102        <service
+102-->[com.google.android.datatransport:transport-runtime:2.2.6] C:\Users\dungl\.gradle\caches\transforms-3\465fb35821d053743fece05b8c1ef7f1\transformed\jetified-transport-runtime-2.2.6\AndroidManifest.xml:26:9-30:19
+103            android:name="com.google.android.datatransport.runtime.scheduling.jobscheduling.JobInfoSchedulerService"
+103-->[com.google.android.datatransport:transport-runtime:2.2.6] C:\Users\dungl\.gradle\caches\transforms-3\465fb35821d053743fece05b8c1ef7f1\transformed\jetified-transport-runtime-2.2.6\AndroidManifest.xml:27:13-117
+104            android:exported="false"
+104-->[com.google.android.datatransport:transport-runtime:2.2.6] C:\Users\dungl\.gradle\caches\transforms-3\465fb35821d053743fece05b8c1ef7f1\transformed\jetified-transport-runtime-2.2.6\AndroidManifest.xml:28:13-37
+105            android:permission="android.permission.BIND_JOB_SERVICE" >
+105-->[com.google.android.datatransport:transport-runtime:2.2.6] C:\Users\dungl\.gradle\caches\transforms-3\465fb35821d053743fece05b8c1ef7f1\transformed\jetified-transport-runtime-2.2.6\AndroidManifest.xml:29:13-69
+106        </service>
+107
+108        <receiver
+108-->[com.google.android.datatransport:transport-runtime:2.2.6] C:\Users\dungl\.gradle\caches\transforms-3\465fb35821d053743fece05b8c1ef7f1\transformed\jetified-transport-runtime-2.2.6\AndroidManifest.xml:32:9-34:40
+109            android:name="com.google.android.datatransport.runtime.scheduling.jobscheduling.AlarmManagerSchedulerBroadcastReceiver"
+109-->[com.google.android.datatransport:transport-runtime:2.2.6] C:\Users\dungl\.gradle\caches\transforms-3\465fb35821d053743fece05b8c1ef7f1\transformed\jetified-transport-runtime-2.2.6\AndroidManifest.xml:33:13-132
+110            android:exported="false" />
+110-->[com.google.android.datatransport:transport-runtime:2.2.6] C:\Users\dungl\.gradle\caches\transforms-3\465fb35821d053743fece05b8c1ef7f1\transformed\jetified-transport-runtime-2.2.6\AndroidManifest.xml:34:13-37
+111
+112        <uses-library
+112-->[androidx.camera:camera-extensions:1.0.0-alpha32] C:\Users\dungl\.gradle\caches\transforms-3\d9a103a907c61212f3366d6adfe941a6\transformed\jetified-camera-extensions-1.0.0-alpha32\AndroidManifest.xml:31:9-33:40
+113            android:name="androidx.camera.extensions.impl"
+113-->[androidx.camera:camera-extensions:1.0.0-alpha32] C:\Users\dungl\.gradle\caches\transforms-3\d9a103a907c61212f3366d6adfe941a6\transformed\jetified-camera-extensions-1.0.0-alpha32\AndroidManifest.xml:32:13-59
+114            android:required="false" />
+114-->[androidx.camera:camera-extensions:1.0.0-alpha32] C:\Users\dungl\.gradle\caches\transforms-3\d9a103a907c61212f3366d6adfe941a6\transformed\jetified-camera-extensions-1.0.0-alpha32\AndroidManifest.xml:33:13-37
+115
+116        <service
+116-->[androidx.camera:camera-camera2:1.1.0-alpha12] C:\Users\dungl\.gradle\caches\transforms-3\6e3fc2d244b3cb9e9228b7ef14257f0e\transformed\jetified-camera-camera2-1.1.0-alpha12\AndroidManifest.xml:26:9-35:19
+117            android:name="androidx.camera.core.impl.MetadataHolderService"
+117-->[androidx.camera:camera-camera2:1.1.0-alpha12] C:\Users\dungl\.gradle\caches\transforms-3\6e3fc2d244b3cb9e9228b7ef14257f0e\transformed\jetified-camera-camera2-1.1.0-alpha12\AndroidManifest.xml:27:13-75
+118            android:enabled="false"
+118-->[androidx.camera:camera-camera2:1.1.0-alpha12] C:\Users\dungl\.gradle\caches\transforms-3\6e3fc2d244b3cb9e9228b7ef14257f0e\transformed\jetified-camera-camera2-1.1.0-alpha12\AndroidManifest.xml:28:13-36
+119            android:exported="false" >
+119-->[androidx.camera:camera-camera2:1.1.0-alpha12] C:\Users\dungl\.gradle\caches\transforms-3\6e3fc2d244b3cb9e9228b7ef14257f0e\transformed\jetified-camera-camera2-1.1.0-alpha12\AndroidManifest.xml:29:13-37
+120            <meta-data
+120-->[androidx.camera:camera-camera2:1.1.0-alpha12] C:\Users\dungl\.gradle\caches\transforms-3\6e3fc2d244b3cb9e9228b7ef14257f0e\transformed\jetified-camera-camera2-1.1.0-alpha12\AndroidManifest.xml:32:13-34:89
+121                android:name="androidx.camera.core.impl.MetadataHolderService.DEFAULT_CONFIG_PROVIDER"
+121-->[androidx.camera:camera-camera2:1.1.0-alpha12] C:\Users\dungl\.gradle\caches\transforms-3\6e3fc2d244b3cb9e9228b7ef14257f0e\transformed\jetified-camera-camera2-1.1.0-alpha12\AndroidManifest.xml:33:17-103
+122                android:value="androidx.camera.camera2.Camera2Config$DefaultProvider" />
+122-->[androidx.camera:camera-camera2:1.1.0-alpha12] C:\Users\dungl\.gradle\caches\transforms-3\6e3fc2d244b3cb9e9228b7ef14257f0e\transformed\jetified-camera-camera2-1.1.0-alpha12\AndroidManifest.xml:34:17-86
+123        </service>
+124
+125        <activity
+125-->[com.google.android.gms:play-services-base:17.6.0] C:\Users\dungl\.gradle\caches\transforms-3\6cee5dccd2a60ab1a2b266eae79fa6d4\transformed\jetified-play-services-base-17.6.0\AndroidManifest.xml:23:9-26:75
+126            android:name="com.google.android.gms.common.api.GoogleApiActivity"
+126-->[com.google.android.gms:play-services-base:17.6.0] C:\Users\dungl\.gradle\caches\transforms-3\6cee5dccd2a60ab1a2b266eae79fa6d4\transformed\jetified-play-services-base-17.6.0\AndroidManifest.xml:24:13-79
+127            android:exported="false"
+127-->[com.google.android.gms:play-services-base:17.6.0] C:\Users\dungl\.gradle\caches\transforms-3\6cee5dccd2a60ab1a2b266eae79fa6d4\transformed\jetified-play-services-base-17.6.0\AndroidManifest.xml:25:13-37
+128            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+128-->[com.google.android.gms:play-services-base:17.6.0] C:\Users\dungl\.gradle\caches\transforms-3\6cee5dccd2a60ab1a2b266eae79fa6d4\transformed\jetified-play-services-base-17.6.0\AndroidManifest.xml:26:13-72
+129
+130        <meta-data
+130-->[com.google.android.gms:play-services-basement:17.6.0] C:\Users\dungl\.gradle\caches\transforms-3\b4572a4f69510f2208f482ec52fe8e1f\transformed\jetified-play-services-basement-17.6.0\AndroidManifest.xml:23:9-25:69
+131            android:name="com.google.android.gms.version"
+131-->[com.google.android.gms:play-services-basement:17.6.0] C:\Users\dungl\.gradle\caches\transforms-3\b4572a4f69510f2208f482ec52fe8e1f\transformed\jetified-play-services-basement-17.6.0\AndroidManifest.xml:24:13-58
+132            android:value="@integer/google_play_services_version" />
+132-->[com.google.android.gms:play-services-basement:17.6.0] C:\Users\dungl\.gradle\caches\transforms-3\b4572a4f69510f2208f482ec52fe8e1f\transformed\jetified-play-services-basement-17.6.0\AndroidManifest.xml:25:13-66
+133    </application>
+134
+135</manifest>
