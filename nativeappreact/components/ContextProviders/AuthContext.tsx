@@ -22,9 +22,18 @@ const AuthContext: React.FC = ({ children }) => {
   const authstate = useRef("");
   const code_verifier = useRef("");
 
-  const GetUserData = (access_token, expires_in, token_type) => {
-    
-  }
+  const GetUserData = async (access_token, expires_in, token_type) => {
+    console.log(access_token, expires_in, token_type);
+    const url = "https://lichess.org/api/account";
+    const Response = await fetch(url, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+      },
+    });
+    const data = await Response.json();
+    console.log(data);
+  };
 
   const RequestAccessToken = async (code) => {
     let headersList = {
