@@ -33,6 +33,7 @@ const AuthContext: React.FC = ({ children }) => {
     });
     const data = await Response.json();
     console.log(data);
+
   };
 
   const RequestAccessToken = async (code) => {

@@ -12,14 +12,14 @@ const StackNavigator = () => {
   return (
     <>
       <Stack.Navigator initialRouteName="Login">
-        {/* {!user ? ( */}
+        {!user ? (
           <Stack.Screen name="Login" component={LoginScreen} />
-        {/* ) : ( */}
-          {/* <> */}
+        ) : (
+          <>
             <Stack.Screen name="Home" component={HomeScreen} />
             <Stack.Screen name="Game" component={GameScreen} />
-          {/* </> */}
-        {/* )} */}
+          </>
+        )}
       </Stack.Navigator>
     </>
   );
