@@ -1,10 +1,12 @@
-import { View, Text } from 'react-native';
-import React from 'react';
+import { Center, HStack, Image, Text, View } from "native-base";
+import React from "react";
+import { useAuth } from "../components/ContextProviders/AuthContext";
 
-const HomeScreen = () => {
+const HomeScreen = ({ navigation }) => {
+  const { user } = useAuth();
   return (
-    <View>
-      <Text>Home</Text>
+    <View flex={1}>
+      
     </View>
   );
 };

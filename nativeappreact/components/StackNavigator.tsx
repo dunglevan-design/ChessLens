@@ -12,14 +12,26 @@ const StackNavigator = () => {
   return (
     <>
       <Stack.Navigator initialRouteName="Login">
-        {!user ? (
-          <Stack.Screen name="Login" component={LoginScreen} />
-        ) : (
-          <>
-            <Stack.Screen name="Home" component={HomeScreen} />
-            <Stack.Screen name="Game" component={GameScreen} />
-          </>
-        )}
+        <Stack.Group screenOptions= { { headerTitleAlign : "center" ,headerTitleStyle : {color: "#fff"}, headerStyle: {
+          backgroundColor: "#040033",
+        }}}>
+          {!user ? (
+            <Stack.Screen name="Login" component={LoginScreen} />
+          ) : (
+            <>
+              <Stack.Screen
+                options={{ headerShown: false }}
+                name="Home"
+                component={HomeScreen}
+              />
+              <Stack.Screen
+                options={{ headerShown: false }}
+                name="Game"
+                component={GameScreen}
+              />
+            </>
+          )}
+        </Stack.Group>
       </Stack.Navigator>
     </>
   );

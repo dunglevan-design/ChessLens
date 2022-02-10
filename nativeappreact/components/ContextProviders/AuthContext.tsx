@@ -10,15 +10,17 @@ const Authcontext = React.createContext({
   LoginWithLichess: async () => {},
   Logout: () => {},
 });
+type User = {
+  name: string,
+  id: string,
+  rating: number,
+  accessToken: string,
+}
 
 const AuthContext: React.FC = ({ children }) => {
   // useAuth here
 
-  const [user, setUser] = useState({
-    name: "",
-    id: "",
-    accessToken: "",
-  });
+  const [user, setUser] = useState<User>(null);
   const authstate = useRef("");
   const code_verifier = useRef("");
 
@@ -34,6 +36,14 @@ const AuthContext: React.FC = ({ children }) => {
     const data = await Response.json();
     console.log(data);
 
+    const { username,perfs ,id } = data;
+    console.log(username, {perfs}, id);
+    setUser({
+      name: username,
+      rating: perfs.rapid.rating,
+      id: id,
+      accessToken: access_token,
+    });
   };
 
   const RequestAccessToken = async (code) => {
@@ -46,7 +56,7 @@ const AuthContext: React.FC = ({ children }) => {
       grant_type: "authorization_code",
       code: code,
       code_verifier: code_verifier.current,
-      redirect_uri: "com.nativeappreact://app/home",
+      redirect_uri: "com.nativeappreact://app/login",
       client_id: "nativeappreact",
     });
     const response = await fetch("https://lichess.org/api/token", {
@@ -117,7 +127,7 @@ const AuthContext: React.FC = ({ children }) => {
     //Open Auth
     Linking.addEventListener("url", HandleRedirect);
     WebBrowser.openAuthSessionAsync(
-      `https://lichess.org/oauth?response_type=code&client_id=nativeappreact&redirect_uri=com.nativeappreact://app/home&code_challenge_method=S256&code_challenge=${code_challenge}&state=${authstate.current}`,
+      `https://lichess.org/oauth?response_type=code&client_id=nativeappreact&redirect_uri=com.nativeappreact://app/login&code_challenge_method=S256&code_challenge=${code_challenge}&state=${authstate.current}`,
       "nativeappreact://app/game"
     );
   };
@@ -129,7 +139,7 @@ const AuthContext: React.FC = ({ children }) => {
 
   return (
     <Authcontext.Provider
-      value={{ user: null, LoginWithLichess: LoginWithLichess, Logout: Logout }}
+      value={{ user: user, LoginWithLichess: LoginWithLichess, Logout: Logout }}
     >
       {children}
     </Authcontext.Provider>
