@@ -20,12 +20,10 @@ const StackNavigator = () => {
           ) : (
             <>
               <Stack.Screen
-                options={{ headerShown: false }}
                 name="Home"
                 component={HomeScreen}
               />
               <Stack.Screen
-                options={{ headerShown: false }}
                 name="Game"
                 component={GameScreen}
               />
