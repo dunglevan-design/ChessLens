@@ -37,7 +37,7 @@ const InviteRoute = () => {
         OR INVITE A LICHESS PLAYER
       </Text>
 
-      <Input mx={3} w="75%" maxWidth={300} value={player} color="#fff" onChange={(e) => setPlayer(e.currentTarget.value)} />
+      <Input mx={3} w="75%" maxWidth={300} value={player} color="#fff" onChangeText={(text) => setPlayer(text)} />
     </View>
   );
 };
