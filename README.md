@@ -2,7 +2,7 @@
 Over the board chess but online with computer vision
 ## Goals
 The goal of this project is not to invent a new algorithm/model to detect chess pieces and board positions But rather to leverage and combine the existing algorithms and APIs to create
-a end-user application
+an end-user application
 ## How it works
 User logs in to their account and select game mode like they would on Lichess. 
 Put your phone at a steady angle to the board where it can see the whole board clearly
