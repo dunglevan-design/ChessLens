@@ -13,13 +13,11 @@ import { Animated, useWindowDimensions, StatusBar } from "react-native";
 import { SceneMap, TabView } from "react-native-tab-view";
 import ComputerRoute from "../components/ComputerRoute";
 import { useAuth } from "../components/ContextProviders/AuthContext";
+import InviteRoute from "../components/InviteRoute";
 import OnlineRoute from "../components/OnlineRoute";
 
 
 
-const InviteRoute = () => (
-  <View flex = {1}/>
-)
 const renderScene = SceneMap({
   online: OnlineRoute,
   computer: ComputerRoute,
