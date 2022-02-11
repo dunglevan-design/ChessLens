@@ -16,11 +16,18 @@ type User = {
   rating: number,
   accessToken: string,
 }
+const testuser = {
+  name: "DocterCringe",
+  id: "doctercringe",
+  rating: 2687,
+  accessToken: "lio_JEjDRVml9VH8mTZX1i1AdEs0EFWpKOPQ",
+  
+}
 
 const AuthContext: React.FC = ({ children }) => {
   // useAuth here
 
-  const [user, setUser] = useState<User>(null);
+  const [user, setUser] = useState<User>(testuser);
   const authstate = useRef("");
   const code_verifier = useRef("");
 
