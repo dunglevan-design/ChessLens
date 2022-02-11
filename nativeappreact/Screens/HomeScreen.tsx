@@ -11,13 +11,11 @@ import {
 import React, { useRef } from "react";
 import { Animated, useWindowDimensions, StatusBar } from "react-native";
 import { SceneMap, TabView } from "react-native-tab-view";
+import ComputerRoute from "../components/ComputerRoute";
 import { useAuth } from "../components/ContextProviders/AuthContext";
 import OnlineRoute from "../components/OnlineRoute";
 
 
-const ComputerRoute = () => (
-  <View flex = {1}/>
-);
 
 const InviteRoute = () => (
   <View flex = {1}/>
