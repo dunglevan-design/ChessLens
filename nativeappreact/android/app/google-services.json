@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "542665048608",
+    "project_id": "cheens-ef98b",
+    "storage_bucket": "cheens-ef98b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:542665048608:android:7aa69952c7c0e5cbacf245",
+        "android_client_info": {
+          "package_name": "com.nativeappreact"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "542665048608-fk4ftjvvr8g4nq3ovrg9rff8i0tn5g1k.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nativeappreact",
+            "certificate_hash": "394272d5be2a5f6bbf7a1d7f67679c8ba350ea8b"
+          }
+        },
+        {
+          "client_id": "542665048608-ke0v8nvag55tq68a5jqnakqe1rtpt619.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDVZ8V5fHNaUzb4-5--Ylk_WL_U9dRCRWQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "542665048608-ke0v8nvag55tq68a5jqnakqe1rtpt619.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

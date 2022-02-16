@@ -2,11 +2,12 @@ import { HStack, Box, Center, Image, View, VStack } from "native-base";
 import React from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import { Text, TouchableOpacity } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 
-const ModeCard = ({ title, desc, svg, color }) => {
+const ModeCard = ({ title, desc, svg, color, onPress}) => {
   return (
     <Box height={250} width={"46%"} rounded={"lg"} position="relative">
-      <TouchableOpacity>
+      <TouchableOpacity onPress = {onPress}>
         <LinearGradient
           colors={color}
           style={{
@@ -57,6 +58,11 @@ const ModeCard = ({ title, desc, svg, color }) => {
   );
 };
 const OnlineRoute = () => {
+  const navigation = useNavigation()
+  const createGame = (type:string) => {
+    //@ts-ignore
+    navigation.navigate("Game", {type : type});
+  }
   return (
     <View flex={1}>
       <Text
@@ -81,6 +87,7 @@ const OnlineRoute = () => {
                 "https://firebasestorage.googleapis.com/v0/b/cheens-ef98b.appspot.com/o/Classical.png?alt=media&token=5271ea65-dc08-4b60-88aa-c9ac705c4600"
               }
               color={["#E402F8", "rgba(112, 0, 255,0.6)"]}
+              onPress={() => createGame("classical")}
             />
             <ModeCard
               title="RAPID"
@@ -89,6 +96,7 @@ const OnlineRoute = () => {
                 "https://firebasestorage.googleapis.com/v0/b/cheens-ef98b.appspot.com/o/Rapid.png?alt=media&token=7e494f8e-04d0-4548-97db-4bfce1f0f1cb"
               }
               color={["#4ABF99", "rgba(112, 0, 255,0.6)"]}
+              onPress={() => createGame("classical")}
             />
           </HStack>
           <HStack space = {3} justifyContent = "center">
@@ -99,6 +107,7 @@ const OnlineRoute = () => {
                 "https://firebasestorage.googleapis.com/v0/b/cheens-ef98b.appspot.com/o/Blitz.png?alt=media&token=78336da1-aee3-4372-8f76-afaba8379a6e"
               }
               color={["#DC4A8C", "rgba(112, 0, 255,0.6)"]}
+              onPress={() => createGame("classical")}
             />
             <ModeCard
               title="10 mins RAPID"
@@ -107,6 +116,7 @@ const OnlineRoute = () => {
                 "https://firebasestorage.googleapis.com/v0/b/cheens-ef98b.appspot.com/o/10mins.png?alt=media&token=3544a4b5-5308-4aee-8b9c-bac9138be11c"
               }
               color={["#F89C4E", "rgba(112, 0, 255,0.6)"]}
+              onPress={() => createGame("classical")}
             />
           </HStack>
         </VStack>
