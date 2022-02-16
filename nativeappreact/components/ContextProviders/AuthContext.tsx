@@ -15,14 +15,15 @@ type User = {
   id: string,
   rating: number,
   accessToken: string,
-}
-const testuser = {
-  name: "DocterCringe",
-  id: "doctercringe",
-  rating: 2687,
-  accessToken: "lio_JEjDRVml9VH8mTZX1i1AdEs0EFWpKOPQ",
+} | null
+const testuser = null
+// const testuser = {
+//   name: "DocterCringe",
+//   id: "doctercringe",
+//   rating: 2687,
+//   accessToken: "lio_JEjDRVml9VH8mTZX1i1AdEs0EFWpKOPQ",
   
-}
+// }
 
 const AuthContext: React.FC = ({ children }) => {
   // useAuth here

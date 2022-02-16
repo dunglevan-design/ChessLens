@@ -28,23 +28,13 @@ const GameScreen = ({ route, navigation }) => {
     }
   }, []);
   
-  const timeout = async() => {
-    let promiseA = new Promise(resolve => {
-      let wait = setTimeout(() => {
-        clearTimeout(wait)
-        resolve("finish init game")
-      }, 500)
-    })
-    return promiseA
-  }
-
   const validate = async() => {
     console.log("good view, lets play")
     return true
   }
   const initGame = async(type) => {
     setFinishMessage("Looking for opponent")
-    await timeout
+    
   }
   const FinishSetup = async() => {
     //run checks
