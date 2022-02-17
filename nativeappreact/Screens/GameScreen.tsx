@@ -2,8 +2,10 @@ import { View, Text, StyleSheet } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Camera, useCameraDevices } from "react-native-vision-camera";
 import { Badge, Box, Button, Center, Image } from "native-base";
+import { useAuth } from "../components/ContextProviders/AuthContext";
 
 const GameScreen = ({ route, navigation }) => {
+  const {user} = useAuth()
   const { type } = route.params;
   const devices = useCameraDevices();
   const device = devices.back;
@@ -34,6 +36,23 @@ const GameScreen = ({ route, navigation }) => {
   }
   const initGame = async(type) => {
     setFinishMessage("Looking for opponent")
+    const gameconfig = {
+      rated: false,
+      time: 10,
+      increment: 5,
+      variant: "standard",  
+    }
+
+    const response = await fetch("https://lichess.org/api/board/seek", {
+      method: "post",
+      headers: {
+        "Authorization": `Bearer ${user.accessToken}`,
+        "content-type": "text/plain"
+      },
+      body: JSON.stringify(gameconfig),
+    });
+    const data = await response.json();
+    console.log(data)
     
   }
   const FinishSetup = async() => {

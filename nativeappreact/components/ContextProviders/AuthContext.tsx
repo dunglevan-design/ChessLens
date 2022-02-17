@@ -5,17 +5,23 @@ import * as WebBrowser from "expo-web-browser";
 import * as Linking from "expo-linking";
 import { Alert } from "react-native";
 
-const Authcontext = React.createContext({
-  user: null,
-  LoginWithLichess: async () => {},
-  Logout: () => {},
-});
+const scopes = "email:read challenge:read challenge:write challenge:bulk board:play"
 type User = {
   name: string,
   id: string,
   rating: number,
   accessToken: string,
 } | null
+type context = {
+  user: User,
+  LoginWithLichess: () => Promise<void>
+  Logout: () => void
+}
+const Authcontext = React.createContext<context>({
+  user: null,
+  LoginWithLichess: async () => {},
+  Logout: () => {},
+});
 const testuser = null
 // const testuser = {
 //   name: "DocterCringe",
@@ -135,7 +141,7 @@ const AuthContext: React.FC = ({ children }) => {
     //Open Auth
     Linking.addEventListener("url", HandleRedirect);
     WebBrowser.openAuthSessionAsync(
-      `https://lichess.org/oauth?response_type=code&client_id=nativeappreact&redirect_uri=com.nativeappreact://app/login&code_challenge_method=S256&code_challenge=${code_challenge}&state=${authstate.current}`,
+      `https://lichess.org/oauth?response_type=code&client_id=nativeappreact&redirect_uri=com.nativeappreact://app/login&code_challenge_method=S256&code_challenge=${code_challenge}&state=${authstate.current}&scope=${scopes}`,
       "nativeappreact://app/game"
     );
   };
