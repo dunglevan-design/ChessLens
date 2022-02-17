@@ -12,6 +12,7 @@
     "@react-native-firebase/app": "^14.5.0",
     "@react-navigation/native": "^6.0.8",
     "@react-navigation/native-stack": "^6.4.0",
+    "axios": "^0.26.0",
     "base64url": "^3.0.1",
     "expo": "~44.0.2",
     "expo-crypto": "~10.1.1",

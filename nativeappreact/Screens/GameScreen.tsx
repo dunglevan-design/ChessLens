@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { Camera, useCameraDevices } from "react-native-vision-camera";
 import { Badge, Box, Button, Center, Image } from "native-base";
 import { useAuth } from "../components/ContextProviders/AuthContext";
+import axios from "axios"
 
 const GameScreen = ({ route, navigation }) => {
   const {user} = useAuth()
@@ -39,20 +40,25 @@ const GameScreen = ({ route, navigation }) => {
     const gameconfig = {
       rated: false,
       time: 10,
-      increment: 5,
       variant: "standard",  
+      increment: 0
     }
+    let headersList = {
+      "Authorization": `Bearer ${user.accessToken}` 
+     }
+     
+     let reqOptions = {
+       url: "https://lichess.org/api/board/seek?",
+       method: "POST",
+       headers: headersList,
+       params: gameconfig,
+     }
+     
+     axios.request(reqOptions).then(function (response) {
+       console.log(">>>>>>>>>>>>>>>")
+       console.log(response.data);
+     })
 
-    const response = await fetch("https://lichess.org/api/board/seek", {
-      method: "post",
-      headers: {
-        "Authorization": `Bearer ${user.accessToken}`,
-        "content-type": "text/plain"
-      },
-      body: JSON.stringify(gameconfig),
-    });
-    const data = await response.json();
-    console.log(data)
     
   }
   const FinishSetup = async() => {
@@ -84,7 +90,7 @@ const GameScreen = ({ route, navigation }) => {
           <Box
           justifyContent={"center"}
           alignItems = "center"
-          top={"80%"}
+          top={"40%"}
           >
             {!finishingSetup ? (
 
