@@ -5,7 +5,7 @@ import { Badge, Box, Button, Center, Image } from "native-base";
 import { useAuth } from "../components/ContextProviders/AuthContext";
 import axios from "axios";
 
-/** All game use this screen */
+/** All game use this screen? */
 const GameScreen = ({ route, navigation }) => {
   const { user } = useAuth();
   const { type } = route.params;

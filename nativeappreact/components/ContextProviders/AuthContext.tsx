@@ -51,7 +51,8 @@ const AuthContext: React.FC = ({ children }) => {
     console.log(data);
 
     const { username,perfs ,id } = data;
-    console.log(username, {perfs}, id);
+
+    //console.log(username, {perfs}, id);
     setUser({
       name: username,
       rating: perfs.rapid.rating,
