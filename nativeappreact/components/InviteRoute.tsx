@@ -7,7 +7,7 @@ import axios from "axios";
 import { useAuth } from "./ContextProviders/AuthContext";
 
 const InviteRoute = () => {
-  const {user } = useAuth();
+  const { user } = useAuth();
   const [url, setURL] = useState("");
   const [player, setPlayer] = useState("");
 
@@ -16,25 +16,45 @@ const InviteRoute = () => {
     setURL("12345");
   }, []);
 
-
-  const InvitePlayer = async() => {
+  const InvitePlayer = async () => {
     let headersList = {
       Authorization: `Bearer ${user.accessToken}`,
     };
 
-    
     let result = await axios.request({
       url: `https://lichess.org/api/challenge/${player}`,
       method: "POST",
-      params:{
+      params: {
         rated: false,
         color: "random",
         variant: "standard",
         keepAliveStream: true,
       },
       headers: headersList,
-    })
+    });
+    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
     console.log(result);
+    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+
+    // const streamresponse = await fetch("https://lichess.org/api/stream/event", {
+    //   method: "GET",
+    //   headers: headersList,
+    // })
+
+    /**TRYING XMLHTTPRequest streaming */
+
+    var request = new XMLHttpRequest();
+    request.open("GET","https://lichess.org/api/stream/event");
+    request.setRequestHeader("Authorization",  `Bearer ${user.accessToken}`);
+    await request.send();
+    
+    request.addEventListener("progress", event => {
+      console.log("there is event")
+      console.log(event)
+    })
+
+
+    console.log(">>>>>>>>REACH HERE>>>>>>>>>")
   }
 
   return (
@@ -55,7 +75,7 @@ const InviteRoute = () => {
         <IconButton
           icon={<Feather name="copy" size={24} color="white" />}
           size={"md"}
-          bg ={"purple.500"}
+          bg={"purple.500"}
         />
       </HStack>
 

@@ -26,8 +26,10 @@
     "react": "17.0.1",
     "react-dom": "17.0.1",
     "react-native": "0.64.3",
+    "react-native-fetch-api": "^3.0.0",
     "react-native-gesture-handler": "~2.1.0",
     "react-native-pager-view": "5.4.9",
+    "react-native-polyfill-globals": "^3.1.0",
     "react-native-reanimated": "~2.3.1",
     "react-native-safe-area-context": "3.3.2",
     "react-native-screens": "~3.10.1",
@@ -36,7 +38,9 @@
     "react-native-tab-view": "^3.1.1",
     "react-native-vision-camera": "^2.12.0",
     "react-native-web": "0.17.1",
-    "vision-camera-image-labeler": "^0.1.6"
+    "text-encoding": "^0.7.0",
+    "vision-camera-image-labeler": "^0.1.6",
+    "web-streams-polyfill": "^3.2.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
