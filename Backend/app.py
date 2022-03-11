@@ -21,7 +21,10 @@ async def consumer(message,websocket):
 async def start(websocket):
     # create client session to lichess API
     session = OAuth2Session("nativeappreact", token={"access_token": "lio_Fw5iaQKZt1tT2x0Xgvo8dCta4JnrfGf8"})
-    client = berserk.Client(session)
+    client = berserk.clients.Client(session)
+    board = berserk.clients.Board(session)
+
+
     
 
 
@@ -43,6 +46,8 @@ async def handler(websocket):
 
 async def main():
     
+
+    print(client.account.get_email())
     async with websockets.serve(handler, "", 8001):
         await asyncio.Future() #run forever
 
