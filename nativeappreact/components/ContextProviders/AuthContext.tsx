@@ -87,10 +87,8 @@ const AuthContext: React.FC = ({ children }) => {
   };
 
   const HandleRedirect = async (url) => {
-    console.log("url: >>>", url);
     // WebBrowser.dismissAuthSession();
     let data: Linking.ParsedURL = Linking.parse(url.url);
-    console.log("data: >>>", data);
 
     const { queryParams } = data;
     const { code, state } = queryParams;

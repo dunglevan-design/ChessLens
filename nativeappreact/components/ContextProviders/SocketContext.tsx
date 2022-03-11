@@ -5,7 +5,7 @@ import { useAuth } from './AuthContext';
 
 const Socketcontext = createContext({
     message: "",
-    sendMessage: async () => {}
+    sendMessage: async (message) => {}
 })
 
 
@@ -17,25 +17,32 @@ const SocketContext = ({children}) => {
     // ref so it remains between render
     var ws = useRef(new WebSocket("ws://localhost:8001")).current
 
-    const sendMessage = async() => {
-        const event = {
-            type: "client test",
-            message: "test message from the client"
-        }
-        ws.send(JSON.stringify(event))
+    const sendMessage = async(action) => {
+        ws.send(JSON.stringify(action))
     }
 
     useEffect(() => {
+        if (user){
+            const action = {
+                type: "signin",
+                data: {
+                    token: user.accessToken
+                }
+            } 
+            sendMessage(action)
+        }
+
+
+
+    }, [user])
+
+    useEffect(() => {
         ws.onopen = () => {
-           const event ={
+           const action ={
                type: "init",
-               message: "init connection, user signed in",
-               data: {
-                   id: user.id,
-                   token: user.accessToken
-               }
+               message: "init connection, user not signed in",
            } 
-           ws.send(JSON.stringify(event))
+           ws.send(JSON.stringify(action))
         } 
         ws.onmessage = (e) => {
             console.log("onMessage:", e.data)

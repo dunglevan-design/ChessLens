@@ -1,28 +1,20 @@
 import { View, Text } from "react-native";
 import React, { useEffect, useState } from "react";
-import { Box, Button, HStack, IconButton, Input } from "native-base";
+import {  HStack, IconButton, Input } from "native-base";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
-import axios from "axios";
 import { useAuth } from "./ContextProviders/AuthContext";
 import { useSocket } from "./ContextProviders/SocketContext";
-import { withSafeAreaInsets } from "react-native-safe-area-context";
 const InviteRoute = () => {
   const { user } = useAuth();
   const [url, setURL] = useState("");
   const [player, setPlayer] = useState("");
   const {message, sendMessage} = useSocket()
 
-  useEffect(() => {
-    console.log("Getting URL");
-    setURL("12345");
-  }, []);
-
   const InvitePlayer = async () => {
     // TODO: sending invite message to backend
     console.log(message)
 
-    sendMessage()
 
     
   }
