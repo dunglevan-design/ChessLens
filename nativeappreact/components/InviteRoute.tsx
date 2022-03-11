@@ -5,11 +5,13 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
 import axios from "axios";
 import { useAuth } from "./ContextProviders/AuthContext";
-
+import { useSocket } from "./ContextProviders/SocketContext";
+import { withSafeAreaInsets } from "react-native-safe-area-context";
 const InviteRoute = () => {
   const { user } = useAuth();
   const [url, setURL] = useState("");
   const [player, setPlayer] = useState("");
+  const {message, sendMessage} = useSocket()
 
   useEffect(() => {
     console.log("Getting URL");
@@ -17,44 +19,12 @@ const InviteRoute = () => {
   }, []);
 
   const InvitePlayer = async () => {
-    let headersList = {
-      Authorization: `Bearer ${user.accessToken}`,
-    };
+    // TODO: sending invite message to backend
+    console.log(message)
 
-    let result = await axios.request({
-      url: `https://lichess.org/api/challenge/${player}`,
-      method: "POST",
-      params: {
-        rated: false,
-        color: "random",
-        variant: "standard",
-        keepAliveStream: true,
-      },
-      headers: headersList,
-    });
-    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-    console.log(result);
-    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+    sendMessage()
 
-    // const streamresponse = await fetch("https://lichess.org/api/stream/event", {
-    //   method: "GET",
-    //   headers: headersList,
-    // })
-
-    /**TRYING XMLHTTPRequest streaming */
-
-    var request = new XMLHttpRequest();
-    request.open("GET","https://lichess.org/api/stream/event");
-    request.setRequestHeader("Authorization",  `Bearer ${user.accessToken}`);
-    await request.send();
     
-    request.addEventListener("progress", event => {
-      console.log("there is event")
-      console.log(event)
-    })
-
-
-    console.log(">>>>>>>>REACH HERE>>>>>>>>>")
   }
 
   return (

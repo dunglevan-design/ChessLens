@@ -48,7 +48,6 @@ const AuthContext: React.FC = ({ children }) => {
       },
     });
     const data = await Response.json();
-    console.log(data);
 
     const { username,perfs ,id } = data;
 
@@ -79,7 +78,6 @@ const AuthContext: React.FC = ({ children }) => {
       body: bodyContent,
       headers: headersList,
     });
-    console.log(response.status);
     if (response.status == 400) {
       throw new Error("Authentication failed, server response with status 400");
     }
@@ -100,7 +98,6 @@ const AuthContext: React.FC = ({ children }) => {
     Linking.removeEventListener("url", HandleRedirect);
     if (state === authstate.current) {
       try {
-        console.log("requesting token");
         await RequestAccessToken(code);
       } catch (error) {
         console.log(error);
@@ -111,7 +108,6 @@ const AuthContext: React.FC = ({ children }) => {
 
   const LoginWithLichess = async () => {
     //trigger webbrowser login PKCE flow
-    console.log("sign in with Lichess");
     //Create credentials: code challenge, state etc.
     code_verifier.current = Array(128)
       .fill("0")
@@ -121,7 +117,6 @@ const AuthContext: React.FC = ({ children }) => {
         )
       )
       .join("");
-    console.log(code_verifier.current);
     const digest = await Crypto.digestStringAsync(
       CryptoDigestAlgorithm.SHA256,
       code_verifier.current,
@@ -133,7 +128,6 @@ const AuthContext: React.FC = ({ children }) => {
       .replace(/\+/g, "-")
       .replace(/\//g, "_")
       .replace(/=/g, "");
-    console.log(code_challenge);
     authstate.current = Array(10)
       .fill("0")
       .map(() => "0123456789".charAt(Math.random() * 10))
