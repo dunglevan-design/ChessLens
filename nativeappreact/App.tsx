@@ -26,11 +26,11 @@ export default function App() {
   return (
     <NavigationContainer linking={linking}>
       <NativeBaseProvider>
-        <SocketContext>
-          <AuthContext>
+        <AuthContext>
+          <SocketContext>
             <StackNavigator />
-          </AuthContext>
-        </SocketContext>
+          </SocketContext>
+        </AuthContext>
       </NativeBaseProvider>
     </NavigationContainer>
   );

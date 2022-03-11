@@ -1,5 +1,6 @@
 import { View, Text } from 'react-native'
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react'
+import { useAuth } from './AuthContext';
 
 
 const Socketcontext = createContext({
@@ -11,6 +12,7 @@ const Socketcontext = createContext({
 
 const SocketContext = ({children}) => { 
     const [message, setMessage] = useState("");
+    const {user} = useAuth();
 
     // ref so it remains between render
     var ws = useRef(new WebSocket("ws://localhost:8001")).current
@@ -25,17 +27,19 @@ const SocketContext = ({children}) => {
 
     useEffect(() => {
         ws.onopen = () => {
-            console.log("connection opened")
-            const event = {
-                type: "init test",
-                message: "connection opened from the client"
-
-            }
-            ws.send(JSON.stringify(event))
-            setMessage("server sent a message")
+           const event ={
+               type: "init",
+               message: "init connection, user signed in",
+               data: {
+                   id: user.id,
+                   token: user.accessToken
+               }
+           } 
+           ws.send(JSON.stringify(event))
         } 
         ws.onmessage = (e) => {
             console.log("onMessage:", e.data)
+            // TODO: do different thing depends on message type. i.e: set different state to populate the tree
         }
         
         ws.onerror = (ev) => {

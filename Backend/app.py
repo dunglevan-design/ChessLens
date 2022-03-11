@@ -1,6 +1,10 @@
 import asyncio
 import websockets
 import json
+import berserk
+from requests_oauthlib import OAuth2Session
+import os
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 
 async def consumer(message,websocket):
@@ -14,16 +18,31 @@ async def consumer(message,websocket):
     await websocket.send(json.dumps(event))
 
     
+async def start(websocket):
+    # create client session to lichess API
+    session = OAuth2Session("nativeappreact", token={"access_token": "lio_Fw5iaQKZt1tT2x0Xgvo8dCta4JnrfGf8"})
+    client = berserk.Client(session)
+    
+
+
+
+    # init game model
+    async for message in websocket:
+        event = json.loads(message)
+        print(event)
 
 
 async def handler(websocket):
-    # create client session to lichess API
-    # init game model
-    async for message in websocket:
-        await consumer(message,websocket)
+    message = await websocket.recv()
+    event = json.loads(message)
+    assert event["type"] == "init"
+    # TODO: GET ACCESS TOKEN. Pass to start
+
+    await start(websocket)
 
 
 async def main():
+    
     async with websockets.serve(handler, "", 8001):
         await asyncio.Future() #run forever
 
