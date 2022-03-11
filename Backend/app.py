@@ -7,15 +7,15 @@ import os
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 
-async def consumer(message,websocket):
-    #do stuff base on message type 
-    data = json.loads(message)
-    print(data)
-    event = {
-        "type": "test",
-        "message": "this is a test"
-    }
-    await websocket.send(json.dumps(event))
+async def consumer(action, websocket, client : berserk.clients.Client , board : berserk.clients.Board):
+    #do stuff base on action type 
+    type = action["type"]
+    if type == "challenge_directly":
+        data = action["data"]
+        challenge_data =client.challenges.create(data["username"], rated=False, color=berserk.enums.Color.WHITE, variant= berserk.enums.Variant.STANDARD)
+        print(challenge_data)
+
+
 
     
 async def start(websocket, token):
@@ -24,15 +24,14 @@ async def start(websocket, token):
     client = berserk.clients.Client(session)
     board = berserk.clients.Board(session)
 
-
-    account = client.account.get_email()
-    print(account)
-
-
     # init game model
+    #threading to read incoming events
+
+
+
     async for message in websocket:
-        event = json.loads(message)
-        print(event)
+        action = json.loads(message)
+        await consumer(action,websocket, client, board)
 
 
 async def handler(websocket):
