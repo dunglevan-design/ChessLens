@@ -1,10 +1,16 @@
 import { View, Text, StyleSheet } from "react-native";
 import React, { useEffect, useState } from "react";
-import { Camera, useCameraDevices } from "react-native-vision-camera";
+import { Camera, useCameraDevices, useFrameProcessor } from "react-native-vision-camera";
 import { Badge, Box, Button, Center, Image } from "native-base";
 import { useAuth } from "../components/ContextProviders/AuthContext";
 import axios from "axios";
 
+
+const wait = (timeout) => {
+  return new Promise(resolve => {
+    setTimeout(resolve, timeout)
+  })
+}
 /** All game use this screen
  * TODO: move camera setup to start of the app maybe.
  */
@@ -60,9 +66,21 @@ const GameScreen = ({ route, navigation }) => {
     //validate camera view
     if (await validate()) {
       await initGame();
+      await wait(1000);
       setfinishedSetup(true);
     }
   };
+
+
+  const frameProcessor = useFrameProcessor((frame) => {
+    'worklet'
+
+    // console.log(frame)
+    // console.log(frame.close)
+
+  }, [])
+
+
   return (
     <View style={{ flex: 1 }}>
       {!permission ? (
@@ -74,12 +92,14 @@ const GameScreen = ({ route, navigation }) => {
               style={StyleSheet.absoluteFill}
               device={device}
               isActive={true}
+              frameProcessor={frameProcessor}
+              frameProcessorFps={0.1}
             ></Camera>
           ) : <></>}
           <Text style={{ fontSize: 20, fontWeight: "600", color: "#f11625" }}>
             Place the camera where it can see the board clearly
           </Text>
-          <Box justifyContent={"center"} alignItems="center" top={"40%"}>
+          <Box justifyContent={"center"} alignItems="center" top={"60%"}>
             {!finishedSetup ? (
               <>
                 <Button
@@ -92,7 +112,7 @@ const GameScreen = ({ route, navigation }) => {
                   Finish
                 </Button>
                 {finishmessage !== "" && (
-                  <Badge colorScheme="info">{finishmessage}</Badge>
+                  <Badge colorScheme="info" rounded={"full"} variant="outline"><Text style = {{fontSize: 30, padding:10, color: "white"}}>{finishmessage}</Text></Badge>
                 )}
               </>
             ) : (
