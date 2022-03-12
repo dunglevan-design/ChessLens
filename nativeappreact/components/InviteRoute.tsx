@@ -14,14 +14,12 @@ const InviteRoute = () => {
   const InvitePlayer = async () => {
     // TODO: sending invite message to backend
     const action = {
-      type : "test",
-      data: "alkdfjlaskjglkj"
+      type : "challengeDirectly",
+      data: {
+        username: player
+      }
     }
-    console.log(action)
     sendMessage(action)
-
-
-    
   }
 
   return (

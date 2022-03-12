@@ -1,75 +1,83 @@
-import { View, Text } from 'react-native'
-import React, { createContext, useContext, useEffect, useRef, useState } from 'react'
-import { useAuth } from './AuthContext';
-
+import { View, Text } from "react-native";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import { useAuth } from "./AuthContext";
 
 const Socketcontext = createContext({
-    message: "",
-    sendMessage: async (message) => {}
-})
+  message: "",
+  sendMessage: async (message) => {},
+});
 
+const SocketContext = ({ children }) => {
+  const [message, setMessage] = useState("");
+  const { user } = useAuth();
 
+  // ref so it remains between render
+  var ws = useRef(new WebSocket("ws://localhost:8001")).current;
 
-const SocketContext = ({children}) => { 
-    const [message, setMessage] = useState("");
-    const {user} = useAuth();
+  const sendMessage = async (action) => {
+    ws.send(JSON.stringify(action));
+  };
 
-    // ref so it remains between render
-    var ws = useRef(new WebSocket("ws://localhost:8001")).current
-
-    const sendMessage = async(action) => {
-        console.log("sending msg to backend")
-        ws.send(JSON.stringify(action))
+  useEffect(() => {
+    if (user) {
+      const action = {
+        type: "signin",
+        data: {
+          token: user.accessToken,
+        },
+      };
+      sendMessage(action);
     }
+  }, [user]);
 
-    useEffect(() => {
-        if (user){
-            const action = {
-                type: "signin",
-                data: {
-                    token: user.accessToken
-                }
-            } 
-            sendMessage(action)
-        }
+  const startGame = (color, time) => {
+    console.log("start game");
+  };
 
+  useEffect(() => {
+    ws.onopen = () => {
+      const action = {
+        type: "init",
+        message: "init connection, user not signed in",
+      };
+      ws.send(JSON.stringify(action));
+    };
+    ws.onmessage = ({ data }) => {
+      const action = JSON.parse(data);
+      console.log("onMessage:", action);
+      // TODO: do different thing depends on message type. i.e: set different state to populate the tree
+      switch (action.type) {
+        case "gameStart":
+          const gameInfo = action.data;
+          startGame(gameInfo.color, gameInfo.time);
+          break;
+      }
+    };
 
+    ws.onerror = (ev) => {
+      console.log(ev);
+    };
 
-    }, [user])
-
-    useEffect(() => {
-        ws.onopen = () => {
-           const action ={
-               type: "init",
-               message: "init connection, user not signed in",
-           } 
-           ws.send(JSON.stringify(action))
-        } 
-        ws.onmessage = (e) => {
-            console.log("onMessage:", e.data)
-            // TODO: do different thing depends on message type. i.e: set different state to populate the tree
-        }
-        
-        ws.onerror = (ev) => {
-            console.log(ev)
-        }
-        
-        ws.onclose = (e) => {
-            console.log(e.code, e.reason)
-        }
-        
-    }, [])
-    
-    
+    ws.onclose = (e) => {
+      console.log(e.code, e.reason);
+    };
+  }, []);
 
   return (
-    <Socketcontext.Provider value = {{message: message, sendMessage: sendMessage}}>
-        {children}
+    <Socketcontext.Provider
+      value={{ message: message, sendMessage: sendMessage }}
+    >
+      {children}
     </Socketcontext.Provider>
-  )
-}
+  );
+};
 
+export const useSocket = () => useContext(Socketcontext);
 
-export const useSocket = () => useContext(Socketcontext)
-
-export default SocketContext
+export default SocketContext;
