@@ -12,7 +12,7 @@ const GameScreen = ({ route, navigation }) => {
   const { user } = useAuth();
   const { config } = route.params;
   const devices = useCameraDevices();
-  const device = devices.front;
+  const device = devices.back;
   const [permission, setPermission] = useState(false);
   const [message, setMessage] = useState("");
   const [finishmessage, setFinishMessage] = useState("");
