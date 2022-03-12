@@ -12,9 +12,7 @@ const GameScreen = ({ route, navigation }) => {
   const { user } = useAuth();
   const { config } = route.params;
   const devices = useCameraDevices();
-  console.log(devices);
   const device = devices.front;
-  console.log(device);
   const [permission, setPermission] = useState(false);
   const [message, setMessage] = useState("");
   const [finishmessage, setFinishMessage] = useState("");
@@ -71,11 +69,13 @@ const GameScreen = ({ route, navigation }) => {
         <Loading />
       ) : (
         <>
-          <Camera
-            style={StyleSheet.absoluteFill}
-            device={device}
-            isActive={true}
-          ></Camera>
+          {device ? (
+            <Camera
+              style={StyleSheet.absoluteFill}
+              device={device}
+              isActive={true}
+            ></Camera>
+          ) : <></>}
           <Text style={{ fontSize: 20, fontWeight: "600", color: "#f11625" }}>
             Place the camera where it can see the board clearly
           </Text>
@@ -91,7 +91,7 @@ const GameScreen = ({ route, navigation }) => {
                 >
                   Finish
                 </Button>
-                {finishmessage && (
+                {finishmessage !== "" && (
                   <Badge colorScheme="info">{finishmessage}</Badge>
                 )}
               </>
