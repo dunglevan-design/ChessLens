@@ -18,6 +18,7 @@ const SocketContext = ({children}) => {
     var ws = useRef(new WebSocket("ws://localhost:8001")).current
 
     const sendMessage = async(action) => {
+        console.log("sending msg to backend")
         ws.send(JSON.stringify(action))
     }
 

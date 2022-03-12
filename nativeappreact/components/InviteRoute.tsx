@@ -13,7 +13,12 @@ const InviteRoute = () => {
 
   const InvitePlayer = async () => {
     // TODO: sending invite message to backend
-    console.log(message)
+    const action = {
+      type : "test",
+      data: "alkdfjlaskjglkj"
+    }
+    console.log(action)
+    sendMessage(action)
 
 
     
