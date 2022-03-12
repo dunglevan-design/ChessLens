@@ -42,6 +42,7 @@ async def producer(websocket, client:berserk.clients.Client, board:berserk.clien
                 "type": "gameStart",
                 "data": {
                     "color": "white",
+                    "isWhite": True,
                     "time" : ""
                 }
             }
