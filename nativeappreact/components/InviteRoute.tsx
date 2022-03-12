@@ -1,26 +1,48 @@
 import { View, Text } from "react-native";
 import React, { useEffect, useState } from "react";
-import {  HStack, IconButton, Input } from "native-base";
+import { HStack, IconButton, Input } from "native-base";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
 import { useAuth } from "./ContextProviders/AuthContext";
 import { useSocket } from "./ContextProviders/SocketContext";
+import { useNavigation, useRoute } from "@react-navigation/native";
 const InviteRoute = () => {
   const { user } = useAuth();
   const [url, setURL] = useState("");
   const [player, setPlayer] = useState("");
-  const {message, sendMessage} = useSocket()
+  const { message, sendMessage } = useSocket();
+  const navigation = useNavigation();
+
+  /**Check if theres change in the message from socket. Handle accordingly */
+  useEffect(() => {
+    if (message) {
+      switch (message.action) {
+        case "startGame":
+          //@ts-ignore
+          navigation.navigate("Game", {
+            config: {
+              isWhite: true,
+              color: "white",
+              time: "",
+            },
+          });
+          break;
+        default:
+          console.log("nothing here");
+      }
+    }
+  }, [message]);
 
   const InvitePlayer = async () => {
     // TODO: sending invite message to backend
     const action = {
-      type : "challengeDirectly",
+      type: "challengeDirectly",
       data: {
-        username: player
-      }
-    }
-    sendMessage(action)
-  }
+        username: player,
+      },
+    };
+    sendMessage(action);
+  };
 
   return (
     <View style={{ flex: 1 }}>

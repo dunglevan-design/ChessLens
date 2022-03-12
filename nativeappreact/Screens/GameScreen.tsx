@@ -5,16 +5,20 @@ import { Badge, Box, Button, Center, Image } from "native-base";
 import { useAuth } from "../components/ContextProviders/AuthContext";
 import axios from "axios";
 
-/** All game use this screen? */
+/** All game use this screen
+ * TODO: move camera setup to start of the app maybe.
+ */
 const GameScreen = ({ route, navigation }) => {
   const { user } = useAuth();
-  const { type } = route.params;
+  const { config } = route.params;
   const devices = useCameraDevices();
-  const device = devices.back;
+  console.log(devices);
+  const device = devices.front;
+  console.log(device);
   const [permission, setPermission] = useState(false);
   const [message, setMessage] = useState("");
   const [finishmessage, setFinishMessage] = useState("");
-  const [finishingSetup, setFinishingSetup] = useState(false);
+  const [finishedSetup, setfinishedSetup] = useState(false);
 
   const requestPermissionAsync = async () => {
     const newPermission = await Camera.requestCameraPermission();
@@ -32,47 +36,33 @@ const GameScreen = ({ route, navigation }) => {
     }
   }, []);
 
+  //validate camera view
+  /**
+   *  TODO: frame processor to approximate camera angle
+   */
   const validate = async () => {
     console.log("good view, lets play");
     return true;
   };
-  /** BOARD SEEKING OPPONENT
-   * TODO: need HTTP stream to get know when someone accept the challenge
-   */
-  const initGame = async (type) => {
-    setFinishMessage("Looking for opponent");
-    const gameconfig = {
-      rated: false,
-      time: 10,
-      variant: "standard",
-      increment: 0,
-    };
-    let headersList = {
-      Authorization: `Bearer ${user.accessToken}`,
-    };
 
-    axios
-      .request({
-        url: "https://lichess.org/api/board/seek?",
-        method: "POST",
-        headers: headersList,
-        params: gameconfig,
-      })
-      .then(function (response) {
-        console.log(">>>>>>>>>>>>>>>");
-        console.log(response.data);
-      });
+  const initGame = async () => {
+    /**
+     * Render game view on top of the camera.
+     * for testing, camera view for now
+     */
+    setFinishMessage("game started");
+    console.log("config: ", config);
   };
 
   const FinishSetup = async () => {
     //run checks
     //initialize game
-    setFinishingSetup(true);
     setFinishMessage("Checking your camera ...");
 
+    //validate camera view
     if (await validate()) {
-      await initGame(type);
-      setFinishingSetup(false);
+      await initGame();
+      setfinishedSetup(true);
     }
   };
   return (
@@ -90,18 +80,23 @@ const GameScreen = ({ route, navigation }) => {
             Place the camera where it can see the board clearly
           </Text>
           <Box justifyContent={"center"} alignItems="center" top={"40%"}>
-            {!finishingSetup ? (
-              <Button
-                rounded={"full"}
-                alignSelf={"center"}
-                position="relative"
-                size={"lg"}
-                onPress={() => FinishSetup()}
-              >
-                Finish
-              </Button>
+            {!finishedSetup ? (
+              <>
+                <Button
+                  rounded={"full"}
+                  alignSelf={"center"}
+                  position="relative"
+                  size={"lg"}
+                  onPress={FinishSetup}
+                >
+                  Finish
+                </Button>
+                {finishmessage && (
+                  <Badge colorScheme="info">{finishmessage}</Badge>
+                )}
+              </>
             ) : (
-              <Badge colorScheme="info">{finishmessage}</Badge>
+              <></>
             )}
           </Box>
         </>

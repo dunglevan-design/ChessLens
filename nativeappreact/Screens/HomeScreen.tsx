@@ -24,7 +24,7 @@ const renderScene = SceneMap({
   invite: InviteRoute,
 });
 
-const HomeScreen = ({ navigation }) => {
+const HomeScreen = ({ navigation, route }) => {
   const { user } = useAuth();
   const layout = useWindowDimensions();
 

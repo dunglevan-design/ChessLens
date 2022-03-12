@@ -8,13 +8,18 @@ import React, {
 } from "react";
 import { useAuth } from "./AuthContext";
 
-const Socketcontext = createContext({
-  message: "",
+type context = {
+    message: msgfromSocketHOC,
+    sendMessage: (message:action) => Promise<void>
+}
+
+const Socketcontext = createContext<context>({
+  message: null,
   sendMessage: async (message) => {},
 });
 
 const SocketContext = ({ children }) => {
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState<msgfromSocketHOC>(null);
   const { user } = useAuth();
 
   // ref so it remains between render
@@ -36,9 +41,16 @@ const SocketContext = ({ children }) => {
     }
   }, [user]);
 
-  const startGame = (color, time) => {
-    console.log("start game");
+  // List of consumer funtions on message
+
+  const startGame = (config: config) => {
+    setMessage({
+      action: "startGame",
+      data: config,
+    });
   };
+
+  // End list of consumer functions on message
 
   useEffect(() => {
     ws.onopen = () => {
@@ -48,14 +60,15 @@ const SocketContext = ({ children }) => {
       };
       ws.send(JSON.stringify(action));
     };
+
     ws.onmessage = ({ data }) => {
       const action = JSON.parse(data);
       console.log("onMessage:", action);
       // TODO: do different thing depends on message type. i.e: set different state to populate the tree
       switch (action.type) {
         case "gameStart":
-          const gameInfo = action.data;
-          startGame(gameInfo.color, gameInfo.time);
+          const config: config = action.data;
+          startGame(config);
           break;
       }
     };

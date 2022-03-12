@@ -4,6 +4,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Text, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
+
 const ModeCard = ({ title, desc, svg, color, onPress}) => {
   return (
     <Box height={250} width={"46%"} rounded={"lg"} position="relative">
@@ -59,9 +60,12 @@ const ModeCard = ({ title, desc, svg, color, onPress}) => {
 };
 const OnlineRoute = () => {
   const navigation = useNavigation()
-  const createGame = (type:string) => {
+  const createGame = (type: string) => {
+    /**
+     * send board seek signal. on startGame message, navigate to Game with config
+     */
     //@ts-ignore
-    navigation.navigate("Game", {type : type});
+    // navigation.navigate("Game", {config : config});
   }
   return (
     <View flex={1}>
