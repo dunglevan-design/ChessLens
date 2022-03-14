@@ -4,11 +4,16 @@ import { Camera, useCameraDevices, useFrameProcessor } from "react-native-vision
 import { Badge, Box, Button, Center, Image } from "native-base";
 import { useAuth } from "../components/ContextProviders/AuthContext";
 import axios from "axios";
+import { GenerateMove } from "../utils/FrameProcessorPlugins";
 
 
 const wait = (timeout) => {
   return new Promise(resolve => {
+<<<<<<< HEAD
     setTimeout(resolve, timeout)
+=======
+    setTimeout(resolve, timeout);
+>>>>>>> configproblembutok
   })
 }
 /** All game use this screen
@@ -71,6 +76,7 @@ const GameScreen = ({ route, navigation }) => {
     }
   };
 
+<<<<<<< HEAD
 
   const frameProcessor = useFrameProcessor((frame) => {
     'worklet'
@@ -81,6 +87,16 @@ const GameScreen = ({ route, navigation }) => {
   }, [])
 
 
+=======
+  const frameProcessor = useFrameProcessor(
+    frame => {
+      'worklet';
+      const generatedMove = GenerateMove(frame)
+      console.log("generated Move: ", generatedMove)
+     
+    },[]
+  ); 
+>>>>>>> configproblembutok
   return (
     <View style={{ flex: 1 }}>
       {!permission ? (
@@ -93,7 +109,10 @@ const GameScreen = ({ route, navigation }) => {
               device={device}
               isActive={true}
               frameProcessor={frameProcessor}
+<<<<<<< HEAD
               frameProcessorFps={0.1}
+=======
+>>>>>>> configproblembutok
             ></Camera>
           ) : <></>}
           <Text style={{ fontSize: 20, fontWeight: "600", color: "#f11625" }}>
