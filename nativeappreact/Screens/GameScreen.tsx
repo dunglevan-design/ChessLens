@@ -1,10 +1,17 @@
 import { View, Text, StyleSheet } from "react-native";
 import React, { useEffect, useState } from "react";
-import { Camera, useCameraDevices } from "react-native-vision-camera";
+import { Camera, useCameraDevices, useFrameProcessor } from "react-native-vision-camera";
 import { Badge, Box, Button, Center, Image } from "native-base";
 import { useAuth } from "../components/ContextProviders/AuthContext";
 import axios from "axios";
+import { GenerateMove } from "../utils/FrameProcessorPlugins";
 
+
+const wait = (timeout) => {
+  return new Promise(resolve => {
+    setTimeout(resolve, timeout);
+  })
+}
 /** All game use this screen
  * TODO: move camera setup to start of the app maybe.
  */
@@ -60,9 +67,19 @@ const GameScreen = ({ route, navigation }) => {
     //validate camera view
     if (await validate()) {
       await initGame();
+      await wait(1000);
       setfinishedSetup(true);
     }
   };
+
+  const frameProcessor = useFrameProcessor(
+    frame => {
+      'worklet';
+      const generatedMove = GenerateMove(frame)
+      console.log("generated Move: ", generatedMove)
+     
+    },[]
+  ); 
   return (
     <View style={{ flex: 1 }}>
       {!permission ? (
@@ -74,6 +91,7 @@ const GameScreen = ({ route, navigation }) => {
               style={StyleSheet.absoluteFill}
               device={device}
               isActive={true}
+              frameProcessor={frameProcessor}
             ></Camera>
           ) : <></>}
           <Text style={{ fontSize: 20, fontWeight: "600", color: "#f11625" }}>
@@ -92,7 +110,7 @@ const GameScreen = ({ route, navigation }) => {
                   Finish
                 </Button>
                 {finishmessage !== "" && (
-                  <Badge colorScheme="info">{finishmessage}</Badge>
+                  <Badge colorScheme="info" rounded={"full"} variant="outline"><Text style = {{fontSize: 30, padding:10, color: "white"}}>{finishmessage}</Text></Badge>
                 )}
               </>
             ) : (
