@@ -4,9 +4,6 @@ import { useAuth } from '../components/ContextProviders/AuthContext';
 import * as Linking from 'expo-linking';
 
 
-import { NativeModules } from 'react-native';
-const {CalendarModule} = NativeModules
-
 const LoginScreen = () => {
   const {LoginWithLichess} = useAuth();
 
@@ -23,22 +20,10 @@ const LoginScreen = () => {
           <Button width = {200} onPress = {() => Testlinking()}>Login as Guest</Button>
 
 
-          {/* Literally for testing, dont try at home */}
-          <NewModuleButton></NewModuleButton>
       </Box>
   );
 };
 
 
-const NewModuleButton = () => {
-    const onPress = () => {
-        CalendarModule.createCalendarEvent("testName", "testLocation")
-    }
-    return (
-        <Button onPress={onPress}>
-            Click to invoke your native module!
-        </Button>
-    )
-}
 
 export default LoginScreen;

@@ -9,11 +9,7 @@ import { GenerateMove } from "../utils/FrameProcessorPlugins";
 
 const wait = (timeout) => {
   return new Promise(resolve => {
-<<<<<<< HEAD
-    setTimeout(resolve, timeout)
-=======
     setTimeout(resolve, timeout);
->>>>>>> configproblembutok
   })
 }
 /** All game use this screen
@@ -76,18 +72,6 @@ const GameScreen = ({ route, navigation }) => {
     }
   };
 
-<<<<<<< HEAD
-
-  const frameProcessor = useFrameProcessor((frame) => {
-    'worklet'
-
-    // console.log(frame)
-    // console.log(frame.close)
-
-  }, [])
-
-
-=======
   const frameProcessor = useFrameProcessor(
     frame => {
       'worklet';
@@ -96,7 +80,6 @@ const GameScreen = ({ route, navigation }) => {
      
     },[]
   ); 
->>>>>>> configproblembutok
   return (
     <View style={{ flex: 1 }}>
       {!permission ? (
@@ -109,10 +92,7 @@ const GameScreen = ({ route, navigation }) => {
               device={device}
               isActive={true}
               frameProcessor={frameProcessor}
-<<<<<<< HEAD
               frameProcessorFps={0.1}
-=======
->>>>>>> configproblembutok
             ></Camera>
           ) : <></>}
           <Text style={{ fontSize: 20, fontWeight: "600", color: "#f11625" }}>

@@ -181,6 +181,16 @@ android {
 
         }
     }
+
+    packagingOptions {
+        exclude('META-INF/native-image/android-x86_64/jnijavacpp/jni-config.json')
+        exclude('META-INF/native-image/android-x86_64/jnijavacpp/reflect-config.json')
+
+
+        exclude('META-INF/native-image/android-arm64/jnijavacpp/jni-config.json')
+        exclude('META-INF/native-image/android-arm64/jnijavacpp/reflect-config.json')
+    }
+
 }
 
 dependencies {
@@ -189,30 +199,19 @@ dependencies {
     implementation "com.facebook.react:react-native:+"
     implementation 'androidx.camera:camera-core:1.0.2'// From node_modules
 
-    def isGifEnabled = (findProperty('expo.gif.enabled') ?: "") == "true";
-    def isWebpEnabled = (findProperty('expo.webp.enabled') ?: "") == "true";
-    def isWebpAnimatedEnabled = (findProperty('expo.webp.animated') ?: "") == "true";
+    implementation group: 'org.bytedeco', name: 'javacpp', version: '1.5.7'
+    implementation group: 'org.bytedeco', name: 'javacpp', version: '1.5.7', classifier: 'android-arm64'
+    //implementation group: 'org.bytedeco', name: 'javacpp', version: '1.5.4', classifier: 'android-x86_64'
 
-    // If your app supports Android versions before Ice Cream Sandwich (API level 14)
-    // All fresco packages should use the same version
-    if (isGifEnabled || isWebpEnabled) {
-        implementation 'com.facebook.fresco:fresco:2.0.0'
-        implementation 'com.facebook.fresco:imagepipeline-okhttp3:2.0.0'
-    }
+    implementation group: 'org.bytedeco', name: 'opencv', version: '4.5.5-1.5.7'
+    implementation group: 'org.bytedeco', name: 'opencv', version: '4.5.5-1.5.7', classifier: 'android-arm64'
+    //implementation group: 'org.bytedeco', name: 'opencv', version: '4.4.0-1.5.4', classifier: 'android-x86_64'
 
-    if (isGifEnabled) {
-        // For animated gif support
-        implementation 'com.facebook.fresco:animated-gif:2.0.0'
-    }
+    implementation group: 'org.bytedeco', name: 'openblas', version: '0.3.19-1.5.7'
+    implementation group: 'org.bytedeco', name: 'openblas', version: '0.3.19-1.5.7', classifier: 'android-arm64'
 
-    if (isWebpEnabled) {
-        // For webp support
-        implementation 'com.facebook.fresco:webpsupport:2.0.0'
-        if (isWebpAnimatedEnabled) {
-            // Animated webp support
-            implementation 'com.facebook.fresco:animated-webp:2.0.0'
-        }
-    }
+    implementation 'org.bytedeco:javacv:1.5.7'
+
     
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}") {
