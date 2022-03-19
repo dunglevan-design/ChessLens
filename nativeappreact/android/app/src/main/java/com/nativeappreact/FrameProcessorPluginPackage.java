@@ -15,7 +15,7 @@ public class FrameProcessorPluginPackage implements ReactPackage {
     @NonNull
     @Override
     public List<NativeModule> createNativeModules(@NonNull ReactApplicationContext reactContext) {
-        FrameProcessorPlugin.register(new MoveGeneratorPlugin());
+        FrameProcessorPlugin.register(new MoveGeneratorPlugin(reactContext));
         return Collections.emptyList();
     }
 
