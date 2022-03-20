@@ -69,48 +69,77 @@ public class FirstFragment extends Fragment {
                Mat D4mat = loadImg("OriginalrsD5F5.jpg", false);
                Mat Orignalmat = loadImg("Originalrs.jpg", false);
                Mat board = loadImg("board.jpg", false);
-               Mat boardcolor = loadImg("board.jpg", true);
+               Mat boardcolor = loadImg("boardtilted.jpg", true);
+               Mat boardtilted = loadImg("boardtilted.jpg", false);
                 /**
                  * Getchessboard corner: First, actually lets just start with a perfect image
                  * . i.e chessboard corner = corner of image. done.
+                 * reorder the corners.
+                 * Perspective transform => get perfect chessboard. Corner at new img corners.
+                 * Get outer corners' on old img using inverse perspective transform.
+                 *
+                 * When finished camera set up:
                  * (user specify when adjust the camera). Save chessboard corner.
-                 * Find perspective using the corner.
-                 * Perspective transform.
-                 * Extrapolation to find outer corner.
-
-
+                 * On frames with piece on. Perform the same perspective transform. (same corners)
+                 * 
                  * Get 64 regions using rows and cols.
                  * 2D arraylist to save 8x8 matrix of averages / Mat
                  * Subtract 2 Mats
                  * Get the coordinate of the difference
                  */
 
-                ArrayList<Point> corners = (ArrayList<Point>) findCorner(board, imageViewOriginal, imageViewE4);
-                for(Point corner : corners){
-                    opencv_imgproc.circle(boardcolor, corner, 25, new Scalar(255,0,0,0), 50, 0, 0);
-                    System.out.println("opencv : col: " + corner.x() + "row : " + corner.y());
-                }
+                Mat corners = findCorner(boardtilted, imageViewOriginal, imageViewE4);
+                print(corners);
+                //Mat corners = new Mat(4,2, opencv_core.CV_32F, new Scalar(0));
 
-                Mat newmat = new Mat(5,1, opencv_core.CV_8UC2, new Point(255,5));
-                UByteRawIndexer indexer = newmat.createIndexer();
-                System.out.println("work here opencv");
-
-                System.out.println("opencv:" + indexer.get(0,0,0));
-                System.out.println("opencv:" + indexer.get(1,1,1));
+                FloatRawIndexer cornerIndexer = corners.createIndexer();
+                Mat newmat = new Mat(4,2, opencv_core.CV_32F, new Scalar(0));
+                FloatRawIndexer indexer = newmat.createIndexer();
                 /**
                  * Perspective transform
                  */
 
-                Point newCorner3 = new Point(corners.get(0).x(), corners.get(2).y());
-                Point newCorner4 = new Point(corners.get(1).x(), corners.get(1).y());
 
-                Mat newCorners = new Mat(1, 4, opencv_core.CV_8UC1, newCorner4);
+//                indexer.put(0,0, cornerIndexer.get(0,0));
+//                indexer.put(0,1, cornerIndexer.get(0,1));
+//
+//                indexer.put(1,0, cornerIndexer.get(1,0));
+//                indexer.put(1,1, cornerIndexer.get(1,1));
+//
+//                indexer.put(2,0, cornerIndexer.get(2,0));
+//                indexer.put(2,1, indexer.get(0,1));
+//
+//                indexer.put(3,0, cornerIndexer.get(3,0));
+//                indexer.put(3,1, indexer.get(1,1));
+
+                indexer.put(0,0, 700);
+                indexer.put(0,1, 100);
+
+                opencv_imgproc.circle(boardcolor, new Point(1375, 1526), 50, new Scalar(255,0,0,0), 50, 0,0 );
+                opencv_imgproc.circle(boardcolor, new Point(702, 1552), 50, new Scalar(0,255,0,0), 50, 0,0 );
+                opencv_imgproc.circle(boardcolor, new Point(1378, 2252), 50, new Scalar(0,0,255,0), 50, 0,0 );
+                opencv_imgproc.circle(boardcolor, new Point(410, 2185), 50, new Scalar(122,122,122,0), 50, 0,0 );
+
+                indexer.put(1,0, 700);
+                indexer.put(1,1, 700);
+
+                indexer.put(2,0, 100);
+                indexer.put(2,1, 100);
+
+                indexer.put(3,0, 100);
+                indexer.put(3,1, 700);
 
 
-                //opencv_imgproc.getPerspectiveTransform()
 
-                Bitmap bmp = MattobitmapConvert(boardcolor);
+                Mat perspective = opencv_imgproc.getPerspectiveTransform(corners, newmat);
+                Mat transformed = new Mat();
+
+                opencv_imgproc.warpPerspective(boardcolor, transformed, perspective, new Size(800,800));
+
+                Bitmap bmp = MattobitmapConvert(transformed);
+                Bitmap bmp1 = MattobitmapConvert(boardcolor);
                 imageViewOriginal.setImageBitmap(bmp);
+                imageViewE4.setImageBitmap(bmp1);
 
             }
         });
@@ -152,13 +181,13 @@ public class FirstFragment extends Fragment {
     }
 
     public void print(Mat mat){
-        UByteRawIndexer sI = mat.createIndexer();
+        FloatRawIndexer sI = mat.createIndexer();
         List<List<Integer>> values = new ArrayList<>();
 
         for(int y = 0; y < mat.rows(); y++){
             List<Integer> rows = new ArrayList<>();
             for (int x = 0; x < mat.cols(); x ++){
-                rows.add(sI.get(y,x));
+                rows.add((int) sI.get(y,x));
             }
             values.add(rows);
         }
@@ -235,8 +264,9 @@ public class FirstFragment extends Fragment {
      * @param mat
      * @return
      */
-    public List<Point> findCorner(Mat mat, ImageView imageViewOriginal, ImageView imageViewE4){
-        List<Point> Points = new ArrayList<>();
+    public Mat findCorner(Mat mat, ImageView imageViewOriginal, ImageView imageViewE4){
+        Mat Points = new Mat(4,2, opencv_core.CV_32F);
+        FloatRawIndexer PointIndexer = Points.createIndexer();
         Mat corners = new Mat();
         boolean found = opencv_calib3d.findChessboardCorners(mat, new Size(7, 7),
                 corners, opencv_calib3d.CALIB_CB_ADAPTIVE_THRESH + opencv_calib3d.CALIB_CB_NORMALIZE_IMAGE);
@@ -262,12 +292,17 @@ public class FirstFragment extends Fragment {
         y = (int) indexer.get(48, 0, 1);
         corner4 = new Point(x,y);
 
-        Points.add(corner1);
-        Points.add(corner2);
-        Points.add(corner3);
-        Points.add(corner4);
+        PointIndexer.put(0,0, corner1.x());
+        PointIndexer.put(0,1, corner1.y());
 
+        PointIndexer.put(1,0,corner2.x());
+        PointIndexer.put(1,1,corner2.y());
 
+        PointIndexer.put(2,0, corner3.x());
+        PointIndexer.put(2,1, corner3.y());
+
+        PointIndexer.put(3, 0, corner4.x());
+        PointIndexer.put(3, 1, corner4.y());
 
         return Points;
     }
