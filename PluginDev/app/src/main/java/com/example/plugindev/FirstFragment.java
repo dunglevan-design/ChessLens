@@ -14,11 +14,8 @@ import androidx.fragment.app.Fragment;
 
 import com.example.plugindev.databinding.FragmentFirstBinding;
 
-import org.bytedeco.javacpp.BytePointer;
-import org.bytedeco.javacpp.indexer.DoubleIndexer;
-import org.bytedeco.javacpp.indexer.FloatIndexer;
+import org.bytedeco.javacpp.indexer.DoubleRawIndexer;
 import org.bytedeco.javacpp.indexer.FloatRawIndexer;
-import org.bytedeco.javacpp.indexer.UByteIndexer;
 import org.bytedeco.javacpp.indexer.UByteRawIndexer;
 import org.bytedeco.javacv.AndroidFrameConverter;
 import org.bytedeco.javacv.Frame;
@@ -28,8 +25,8 @@ import org.bytedeco.opencv.global.opencv_core;
 import org.bytedeco.opencv.global.opencv_imgcodecs;
 import org.bytedeco.opencv.global.opencv_imgproc;
 import org.bytedeco.opencv.opencv_core.Mat;
+import org.bytedeco.opencv.opencv_core.MatExpr;
 import org.bytedeco.opencv.opencv_core.Point;
-import org.bytedeco.opencv.opencv_core.PointVector;
 import org.bytedeco.opencv.opencv_core.Rect;
 import org.bytedeco.opencv.opencv_core.Scalar;
 import org.bytedeco.opencv.opencv_core.Size;
@@ -37,7 +34,6 @@ import org.bytedeco.opencv.opencv_core.Size;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.cert.PolicyNode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -66,20 +62,19 @@ public class FirstFragment extends Fragment {
         binding.buttonFirst.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-               Mat D4mat = loadImg("OriginalrsD5F5.jpg", false);
-               Mat Orignalmat = loadImg("Originalrs.jpg", false);
+               Mat E4mat = loadImg("E4.jpg", false);
+               Mat Orignalmat = loadImg("Original.jpg", false);
                Mat board = loadImg("board.jpg", false);
-               Mat boardcolor = loadImg("boardtilted.jpg", true);
-               Mat boardtilted = loadImg("boardtilted.jpg", false);
+               Mat boardcolor = loadImg("board.jpg", true);
+               //Mat boardtilted = loadImg("boardtilted.jpg", false);
                 /**
-                 * Getchessboard corner: First, actually lets just start with a perfect image
-                 * . i.e chessboard corner = corner of image. done.
+                 * find 4 inner corners using findchessboard corner. (done)
                  * reorder the corners.
                  * Perspective transform => get perfect chessboard. Corner at new img corners.
-                 * Get outer corners' on old img using inverse perspective transform.
+                 * Get outer corners' on old img using inverse perspective transform. (done)
                  *
                  * When finished camera set up:
-                 * (user specify when adjust the camera). Save chessboard corner.
+                 * Save chessboard corner.
                  * On frames with piece on. Perform the same perspective transform. (same corners)
                  * 
                  * Get 64 regions using rows and cols.
@@ -88,37 +83,31 @@ public class FirstFragment extends Fragment {
                  * Get the coordinate of the difference
                  */
 
-                Mat corners = findCorner(boardtilted, imageViewOriginal, imageViewE4);
-                print(corners);
-                //Mat corners = new Mat(4,2, opencv_core.CV_32F, new Scalar(0));
-
+                Mat corners = findCorner(boardcolor, imageViewOriginal, imageViewE4);
+                Floatprint(corners);
                 FloatRawIndexer cornerIndexer = corners.createIndexer();
-                Mat newmat = new Mat(4,2, opencv_core.CV_32F, new Scalar(0));
-                FloatRawIndexer indexer = newmat.createIndexer();
+                    opencv_imgproc.circle(boardcolor, new Point((int) cornerIndexer.
+                            get(0, 0), (int) cornerIndexer.get(0, 1)), 50,
+                            new Scalar(255, 0, 0, 0), 50, 0, 0);
+                    opencv_imgproc.circle(boardcolor, new Point((int) cornerIndexer.
+                                    get(1, 0), (int) cornerIndexer.get(1, 1)), 50,
+                            new Scalar(0, 255, 0, 0), 50, 0, 0);
+                    opencv_imgproc.circle(boardcolor, new Point((int) cornerIndexer.
+                                    get(2, 0), (int) cornerIndexer.get(2, 1)), 50,
+                            new Scalar(0, 0, 255, 0), 50, 0, 0);
+                    opencv_imgproc.circle(boardcolor, new Point((int) cornerIndexer.
+                                    get(3, 0), (int) cornerIndexer.get(3, 1)), 50,
+                            new Scalar(122, 122, 122, 0), 50, 0, 0);
+
+
+                //Mat corners = new Mat(4,2, opencv_core.CV_32F, new Scalar(0));
                 /**
                  * Perspective transform
                  */
-
-
-//                indexer.put(0,0, cornerIndexer.get(0,0));
-//                indexer.put(0,1, cornerIndexer.get(0,1));
-//
-//                indexer.put(1,0, cornerIndexer.get(1,0));
-//                indexer.put(1,1, cornerIndexer.get(1,1));
-//
-//                indexer.put(2,0, cornerIndexer.get(2,0));
-//                indexer.put(2,1, indexer.get(0,1));
-//
-//                indexer.put(3,0, cornerIndexer.get(3,0));
-//                indexer.put(3,1, indexer.get(1,1));
-
+                Mat newmat = new Mat(4,2, opencv_core.CV_32F, new Scalar(0));
+                FloatRawIndexer indexer = newmat.createIndexer();
                 indexer.put(0,0, 700);
                 indexer.put(0,1, 100);
-
-                opencv_imgproc.circle(boardcolor, new Point(1375, 1526), 50, new Scalar(255,0,0,0), 50, 0,0 );
-                opencv_imgproc.circle(boardcolor, new Point(702, 1552), 50, new Scalar(0,255,0,0), 50, 0,0 );
-                opencv_imgproc.circle(boardcolor, new Point(1378, 2252), 50, new Scalar(0,0,255,0), 50, 0,0 );
-                opencv_imgproc.circle(boardcolor, new Point(410, 2185), 50, new Scalar(122,122,122,0), 50, 0,0 );
 
                 indexer.put(1,0, 700);
                 indexer.put(1,1, 700);
@@ -130,11 +119,85 @@ public class FirstFragment extends Fragment {
                 indexer.put(3,1, 700);
 
 
-
                 Mat perspective = opencv_imgproc.getPerspectiveTransform(corners, newmat);
+                Mat invperspective = opencv_imgproc.getPerspectiveTransform(newmat, corners);
                 Mat transformed = new Mat();
+                opencv_imgproc.warpPerspective(boardcolor, transformed, perspective, new Size(800, 800));
 
-                opencv_imgproc.warpPerspective(boardcolor, transformed, perspective, new Size(800,800));
+                /**
+                 * Inverse warpPerspective to find outer corners
+                 */
+                Mat outerCorners = new Mat(3,4, opencv_core.CV_64FC1, new Scalar(0));
+                Mat RevertedouterCorners = new Mat(3,4, opencv_core.CV_64FC1, new Scalar(0));
+
+                DoubleRawIndexer outerCornerIndexer = outerCorners.createIndexer();
+                DoubleRawIndexer RevertedouterCornerIndexer = RevertedouterCorners.createIndexer();
+
+                outerCornerIndexer.put(0,0, 800);
+                outerCornerIndexer.put(1,0, 0);
+                outerCornerIndexer.put(2,0, 1);
+
+                outerCornerIndexer.put(0,1, 800);
+                outerCornerIndexer.put(1,1, 800);
+                outerCornerIndexer.put(2,1, 1);
+
+                outerCornerIndexer.put(0,2, 0);
+                outerCornerIndexer.put(1,2, 0);
+                outerCornerIndexer.put(2,2, 1);
+
+                outerCornerIndexer.put(0,3, 0);
+                outerCornerIndexer.put(1,3, 800);
+                outerCornerIndexer.put(2,3, 1);
+
+//                Mat testpoint = new Mat(3, 1, opencv_core.CV_64FC1, new Scalar(0));
+//                DoubleRawIndexer dindexer = testpoint.createIndexer();
+//                dindexer.put(0,0, 0);
+//                dindexer.put(1, 0, 0);
+//                dindexer.put(2,0,1);
+
+                Mat hemo = new Mat();
+                opencv_core.gemm(perspective.inv().asMat().t().asMat(), outerCorners,
+                        1, new Mat(), 0, hemo,
+                        1);
+                DoubleRawIndexer hemoindexer = hemo.createIndexer();
+                Mat outercorner1 = hemo.col(0).mul(new Mat(3,1, opencv_core.CV_64FC1,
+                        new Scalar(1)), 1/hemoindexer.get(2,0)).asMat();
+
+                Mat outercorner2 = hemo.col(1).mul(new Mat(3,1, opencv_core.CV_64FC1,
+                        new Scalar(1)), 1/hemoindexer.get(2,1)).asMat();
+
+                Mat outercorner3 = hemo.col(2).mul(new Mat(3,1, opencv_core.CV_64FC1,
+                        new Scalar(1)), 1/hemoindexer.get(2,2)).asMat();
+
+                Mat outercorner4 = hemo.col(3).mul(new Mat(3,1, opencv_core.CV_64FC1,
+                        new Scalar(1)), 1/hemoindexer.get(2,3)).asMat();
+
+                DoubleRawIndexer outercorner1indexer = outercorner1.createIndexer();
+                DoubleRawIndexer outercorner2indexer = outercorner2.createIndexer();
+                DoubleRawIndexer outercorner3indexer = outercorner3.createIndexer();
+                DoubleRawIndexer outercorner4indexer = outercorner4.createIndexer();
+
+                opencv_imgproc.circle(boardcolor, new Point((int)Math.round(outercorner1indexer.get(0,0)),
+                                (int)Math.round(outercorner1indexer.get(1,0))), 50,
+                        new Scalar(255, 0, 0, 0), 50, 0, 0);
+
+
+                opencv_imgproc.circle(boardcolor, new Point((int)Math.round(outercorner2indexer.get(0,0)),
+                                (int)Math.round(outercorner2indexer.get(1,0))), 50,
+                        new Scalar(0, 255, 0, 0), 50, 0, 0);
+
+
+                opencv_imgproc.circle(boardcolor, new Point((int)Math.round(outercorner3indexer.get(0,0)),
+                                (int)Math.round(outercorner3indexer.get(1,0))), 50,
+                        new Scalar(0, 0, 255, 0), 50, 0, 0);
+
+
+                opencv_imgproc.circle(boardcolor, new Point((int)Math.round(outercorner4indexer.get(0,0)),
+                                (int)Math.round(outercorner4indexer.get(1,0))), 50,
+                        new Scalar(122, 122, 122, 0), 50, 0, 0);
+
+
+
 
                 Bitmap bmp = MattobitmapConvert(transformed);
                 Bitmap bmp1 = MattobitmapConvert(boardcolor);
@@ -180,7 +243,7 @@ public class FirstFragment extends Fragment {
         return bitmap;
     }
 
-    public void print(Mat mat){
+    public void Floatprint(Mat mat){
         FloatRawIndexer sI = mat.createIndexer();
         List<List<Integer>> values = new ArrayList<>();
 
@@ -188,6 +251,21 @@ public class FirstFragment extends Fragment {
             List<Integer> rows = new ArrayList<>();
             for (int x = 0; x < mat.cols(); x ++){
                 rows.add((int) sI.get(y,x));
+            }
+            values.add(rows);
+        }
+
+        System.out.println("opencv " + values);
+    }
+
+    public void Doubleprint(Mat mat){
+        DoubleRawIndexer sI = mat.createIndexer();
+        List<List<Double>> values = new ArrayList<>();
+
+        for(int y = 0; y < mat.rows(); y++){
+            List<Double> rows = new ArrayList<>();
+            for (int x = 0; x < mat.cols(); x ++){
+                rows.add(sI.get(y,x));
             }
             values.add(rows);
         }
