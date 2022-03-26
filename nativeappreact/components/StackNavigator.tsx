@@ -26,6 +26,7 @@ const StackNavigator = () => {
               <Stack.Screen
                 name="Game"
                 component={GameScreen}
+                options = {{headerShown: false}}
               />
             </>
           )}
