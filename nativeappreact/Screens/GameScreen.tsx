@@ -1,4 +1,10 @@
+/***
+ * This screen first checks the camera. Set up the board. Then start a game
+ * with passed configurations
+ */
+
 import { View, Text, StyleSheet } from "react-native";
+
 import React, { useEffect, useState } from "react";
 import {
   Camera,
@@ -84,7 +90,7 @@ const GameScreen = ({ route, navigation }) => {
         <>
           {device ? (
             <Camera
-              style={StyleSheet.absoluteFill}
+              style={[StyleSheet.absoluteFill, {aspectRatio: 1}]}
               device={device}
               isActive={true}
               frameProcessor={frameProcessor}

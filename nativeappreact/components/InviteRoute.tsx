@@ -35,6 +35,7 @@ const InviteRoute = () => {
 
   const InvitePlayer = async () => {
     // TODO: sending invite message to backend
+
     const action = {
       type: "challengeDirectly",
       data: {

@@ -16,6 +16,7 @@ public class FrameProcessorPluginPackage implements ReactPackage {
     @Override
     public List<NativeModule> createNativeModules(@NonNull ReactApplicationContext reactContext) {
         FrameProcessorPlugin.register(new MoveGeneratorPlugin(reactContext));
+        FrameProcessorPlugin.register(new CameraCheckPlugin(reactContext));
         return Collections.emptyList();
     }
 
