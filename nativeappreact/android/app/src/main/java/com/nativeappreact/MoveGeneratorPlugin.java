@@ -72,6 +72,7 @@ public class MoveGeneratorPlugin extends FrameProcessorPlugin{
         Frame frame = converterToFrame.convert(bmp);
         OpenCVFrameConverter.ToMat converterToMat = new OpenCVFrameConverter.ToMat();
         Mat mat = converterToMat.convert(frame);
+        System.out.println("opencv" + mat.size() );
 
         Instant finish = Instant.now();
         long timeElapsed = Duration.between(start, finish).toMillis();

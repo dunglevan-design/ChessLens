@@ -181,6 +181,8 @@ public class FirstFragment extends Fragment {
                                 (int)Math.round(outercorner1indexer.get(1,0))), 50,
                         new Scalar(255, 0, 0, 0), 50, 0, 0);
 
+                System.out.println("opencv" + outercorner1indexer.get(0,0)+ "opencv" + outercorner1indexer.get(1,0));
+
 
                 opencv_imgproc.circle(boardcolor, new Point((int)Math.round(outercorner2indexer.get(0,0)),
                                 (int)Math.round(outercorner2indexer.get(1,0))), 50,

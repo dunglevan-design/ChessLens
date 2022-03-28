@@ -3,7 +3,7 @@
  * with passed configurations
  */
 
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Dimensions } from "react-native";
 
 import React, { useEffect, useState } from "react";
 import {
@@ -15,20 +15,19 @@ import { Badge, Box, Button, Center, Image, Modal } from "native-base";
 import { useAuth } from "../components/ContextProviders/AuthContext";
 import axios from "axios";
 import { CheckCamera, GenerateMove } from "../utils/FrameProcessorPlugins";
+import Animated, { useAnimatedStyle, useSharedValue } from "react-native-reanimated";
 
-const wait = (timeout) => {
-  return new Promise((resolve) => {
-    setTimeout(resolve, timeout);
-  });
-};
-/** All game use this screen
- * TODO: move camera setup to start of the app maybe.
- */
+
+const windowWidth = Dimensions.get('window').width;
+const windowHeight = Dimensions.get('window').height;
+
 const GameScreen = ({ route, navigation }) => {
   const { user } = useAuth();
   const { config } = route.params;
   const devices = useCameraDevices();
-  const device = devices.front;
+  const device = devices.back;
+
+  const firstcorner = useSharedValue({ top: 700, left: 133})
 
 
   const [permission, setPermission] = useState(false);
@@ -78,7 +77,17 @@ const GameScreen = ({ route, navigation }) => {
 
     // const generatedMove = GenerateMove(frame);
     // console.log("generated Move: ", generatedMove);
+    // console.log(frame.height, windowHeight)
+    // console.log(frame.width, windowWidth)
   }, []);
+
+  const boxOverlayStyle = useAnimatedStyle(() => ({
+    position: 'absolute',
+    backgroundColor: "red",
+    width: 20,
+    height: 20,
+    ...firstcorner.value
+  }), [firstcorner])
 
   return (
     <View style={{ flex: 1 }}>
@@ -129,6 +138,7 @@ const GameScreen = ({ route, navigation }) => {
           </Box>
         </>
       )}
+      <Animated.View style={boxOverlayStyle} />
     </View>
   );
 };
