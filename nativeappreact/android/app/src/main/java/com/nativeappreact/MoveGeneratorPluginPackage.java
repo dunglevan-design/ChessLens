@@ -11,12 +11,11 @@ import com.mrousavy.camera.frameprocessor.FrameProcessorPlugin;
 import java.util.Collections;
 import java.util.List;
 
-public class FrameProcessorPluginPackage implements ReactPackage {
+public class MoveGeneratorPluginPackage implements ReactPackage {
     @NonNull
     @Override
     public List<NativeModule> createNativeModules(@NonNull ReactApplicationContext reactContext) {
         FrameProcessorPlugin.register(new MoveGeneratorPlugin(reactContext));
-        FrameProcessorPlugin.register(new CameraCheckPlugin(reactContext));
         return Collections.emptyList();
     }
 

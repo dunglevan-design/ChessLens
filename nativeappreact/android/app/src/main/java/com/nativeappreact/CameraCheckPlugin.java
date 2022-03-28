@@ -18,7 +18,7 @@ public class CameraCheckPlugin extends FrameProcessorPlugin {
      * @param reactContext
      */
     Context context;
-    protected CameraCheckPlugin(ReactApplicationContext reactContext) {
+    CameraCheckPlugin(ReactApplicationContext reactContext) {
         super("CheckCamera");
         this.context = reactContext;
     }

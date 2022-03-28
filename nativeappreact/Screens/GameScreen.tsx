@@ -14,7 +14,7 @@ import {
 import { Badge, Box, Button, Center, Image, Modal } from "native-base";
 import { useAuth } from "../components/ContextProviders/AuthContext";
 import axios from "axios";
-import { GenerateMove } from "../utils/FrameProcessorPlugins";
+import { CheckCamera, GenerateMove } from "../utils/FrameProcessorPlugins";
 
 const wait = (timeout) => {
   return new Promise((resolve) => {
@@ -28,7 +28,7 @@ const GameScreen = ({ route, navigation }) => {
   const { user } = useAuth();
   const { config } = route.params;
   const devices = useCameraDevices();
-  const device = devices.back;
+  const device = devices.front;
 
 
   const [permission, setPermission] = useState(false);
@@ -52,10 +52,6 @@ const GameScreen = ({ route, navigation }) => {
     }
 
   }, []);
-  //validate camera view
-  /**
-   *  TODO: frame processor to approximate camera angle
-   */
 
   const initGame = async () => {
     /**
@@ -77,9 +73,11 @@ const GameScreen = ({ route, navigation }) => {
   const frameProcessor = useFrameProcessor((frame) => {
     "worklet";
     // Draw Corners.
+    const corners = CheckCamera(frame);
+    console.log("corners:", corners)
 
-    const generatedMove = GenerateMove(frame);
-    console.log("generated Move: ", generatedMove);
+    // const generatedMove = GenerateMove(frame);
+    // console.log("generated Move: ", generatedMove);
   }, []);
 
   return (
