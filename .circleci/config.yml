@@ -38,9 +38,6 @@ jobs:
       #     system-image: system-images;android-25;google_apis;x86
 
       # And finally run the release build
-      - run: 
-          name: chmod permissions
-          command: chmod +x ./gradlew
       - run:
           name: Install dependencies
           command: yarn install --frozen-lockfile
