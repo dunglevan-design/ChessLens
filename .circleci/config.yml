@@ -16,7 +16,7 @@ jobs:
   build-and-test:
     # These next lines define the Android machine image executor.
     # See: https://circleci.com/docs/2.0/executor-types/
-    working_directory: ~/ChessLens/nativeappreact
+    working_directory: ~/ChessLens/nativeappreact/android
     executor:
       name: android/android-machine
 
@@ -28,8 +28,8 @@ jobs:
          path: ~/ChessLens
 
       # The next step will run the unit tests
-      - android/run-tests:
-          test-command: ./gradlew lint testDebug --continue
+      # - android/run-tests:
+      #     test-command: ./gradlew lint testDebug --continue
 
       # Then start the emulator and run the Instrumentation tests!
       - android/start-emulator-and-run-tests:
