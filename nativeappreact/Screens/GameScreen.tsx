@@ -34,8 +34,6 @@ const GameScreen = ({ route, navigation }) => {
 
   const [permission, setPermission] = useState(false);
   const [appmessage, setAppMessage] = useState("");
-  const [finishmessage, setFinishMessage] = useState("");
-  const [finishedSetup, setfinishedSetup] = useState(false);
   const [btntitle, setBtnTitle] = useState("Next");
   const [setupMessage, setSetupMessage] = useState(
     "Place the camera still at the side of the board, check if the board corners are drawn correctly"
@@ -71,7 +69,7 @@ const GameScreen = ({ route, navigation }) => {
       switch (message.action) {
         case "startGame":
           console.log("start game");
-          setSetupStage("GameStarted")
+          setSetupStage("GameStarted");
           break;
         default:
           console.log("nothing here");
@@ -84,7 +82,6 @@ const GameScreen = ({ route, navigation }) => {
      * Render game view on top of the camera.
      * for testing, camera view for now
      */
-    setFinishMessage("game started");
     console.log("config: ", config);
   };
 
@@ -126,7 +123,7 @@ const GameScreen = ({ route, navigation }) => {
        * Frames are rotated by 90deg
        */
 
-      switch (setupStage){
+      switch (setupStage) {
         case "CheckCorners":
           const xscale = windowWidth / frame.height;
           const yscale = windowWidth / 0.5625 / frame.width;
@@ -156,10 +153,16 @@ const GameScreen = ({ route, navigation }) => {
           break;
 
         /**
-         * 
+         *
          */
-        case "GameStarted"
-      }    
+        case "GameStarted":
+          break;
+          case "MoveMade":
+            setSetupStage("MoveBeingMade");
+            // GenerateMove(frame, [prevImg, corner1.value, corner2.value, corner3.value, corner4.value])
+
+          break;
+      }
       // const generatedMove = GenerateMove(frame);
       // console.log("generated Move: ", generatedMove);
       // console.log(frame.height, windowHeight)
@@ -253,6 +256,19 @@ const GameScreen = ({ route, navigation }) => {
               >
                 {btntitle}
               </Button>
+
+              {setupStage == "GameStarted" && (
+                <Button
+                  rounded={"full"}
+                  alignSelf={"center"}
+                  position="relative"
+                  size={"lg"}
+                  onPress={() => setSetupStage("MoveMade")}
+                  zIndex={10}
+                >
+                  {"confirm move made"}
+                </Button>
+              )}
             </Box>
           </>
         )}
