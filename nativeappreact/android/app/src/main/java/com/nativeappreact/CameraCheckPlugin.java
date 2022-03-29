@@ -64,6 +64,12 @@ public class CameraCheckPlugin extends FrameProcessorPlugin {
         Mat mat = converterToMat.convert(frame);
 
         Mat corners = findCorner(mat);
+        if(corners.empty()) {
+            System.out.println("empty corners");
+            int [][] placeholders = {{0,0}, {0,0}, {0,0}, {0,0}};
+            return placeholders;
+        }
+
 
         /** Perspective transform */
         Mat newmat = new Mat(4,2, opencv_core.CV_32F, new Scalar(0));
@@ -160,6 +166,8 @@ public class CameraCheckPlugin extends FrameProcessorPlugin {
         Mat corners = new Mat();
         boolean found = opencv_calib3d.findChessboardCorners(mat, new Size(7, 7),
                 corners, opencv_calib3d.CALIB_CB_ADAPTIVE_THRESH + opencv_calib3d.CALIB_CB_NORMALIZE_IMAGE);
+
+        if (!found) return corners;
         opencv_calib3d.drawChessboardCorners(mat, new Size(7,7), corners, found);
 
         int x;

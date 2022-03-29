@@ -10,39 +10,30 @@ const InviteRoute = () => {
   const { user } = useAuth();
   const [url, setURL] = useState("");
   const [player, setPlayer] = useState("");
-  const { message, sendMessage } = useSocket();
   const navigation = useNavigation();
 
-  /**Check if theres change in the message from socket. Handle accordingly */
-  useEffect(() => {
-    if (message) {
-      switch (message.action) {
-        case "startGame":
-          //@ts-ignore
-          navigation.navigate("Game", {
-            config: {
-              isWhite: true,
-              color: "white",
-              time: "",
-            },
-          });
-          break;
-        default:
-          console.log("nothing here");
-      }
-    }
-  }, [message]);
-
   const InvitePlayer = async () => {
-    // TODO: sending invite message to backend
+    /**
+     * TODO: navigate to GameScreen with invite config.
+     */
 
-    const action = {
-      type: "challengeDirectly",
-      data: {
+    // const action = {
+    //   type: "challengeDirectly",
+    //   data: {
+    //     username: player,
+    //   },
+    // };
+    // sendMessage(action);
+
+    //@ts-ignore
+    navigation.navigate("Game", {
+      config: {
+        gametype: "invite",
         username: player,
-      },
-    };
-    sendMessage(action);
+        gametime: 10,
+        gameincrement: 5,
+      }
+    })
   };
 
   return (

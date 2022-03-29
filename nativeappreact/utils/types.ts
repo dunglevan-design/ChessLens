@@ -1,7 +1,8 @@
 type config = {
-    isWhite: boolean,
-    color: string,
-    time: number|string
+    gametype: string,
+    username: string,
+    gametime: number,
+    gameincrement: number,
 }
 
 type msgfromSocketHOC = {

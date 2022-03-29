@@ -20,20 +20,27 @@ import Animated, {
   useSharedValue,
 } from "react-native-reanimated";
 import Svg, { Line } from "react-native-svg";
+import { useSocket } from "../components/ContextProviders/SocketContext";
 
 const windowWidth = Dimensions.get("window").width;
 const windowHeight = Dimensions.get("window").height;
 
 const GameScreen = ({ route, navigation }) => {
   const { user } = useAuth();
-  const { config } = route.params;
+  const { message, sendMessage } = useSocket();
+  const { config }: { config: config } = route.params;
   const devices = useCameraDevices();
   const device = devices.back;
 
   const [permission, setPermission] = useState(false);
-  const [message, setMessage] = useState("");
+  const [appmessage, setAppMessage] = useState("");
   const [finishmessage, setFinishMessage] = useState("");
   const [finishedSetup, setfinishedSetup] = useState(false);
+  const [btntitle, setBtnTitle] = useState("Next");
+  const [setupMessage, setSetupMessage] = useState(
+    "Place the camera still at the side of the board, check if the board corners are drawn correctly"
+  );
+  const [setupStage, setSetupStage] = useState("CheckCorners");
 
   const corner1 = useSharedValue({ x: 0, y: 0 });
   const corner2 = useSharedValue({ x: 0, y: 0 });
@@ -44,9 +51,9 @@ const GameScreen = ({ route, navigation }) => {
     const newPermission = await Camera.requestCameraPermission();
     if (newPermission === "authorized") {
       setPermission(true);
-      setMessage("");
+      setAppMessage("");
     } else {
-      setMessage("you need to enable camera to use this feature.");
+      setAppMessage("you need to enable camera to use this feature.");
     }
   };
 
@@ -55,6 +62,22 @@ const GameScreen = ({ route, navigation }) => {
       requestPermissionAsync();
     }
   }, []);
+
+  /**
+   * Check if theres change in the message from socket. Handle accordingly
+   */
+  useEffect(() => {
+    if (message) {
+      switch (message.action) {
+        case "startGame":
+          console.log("start game");
+          setSetupStage("GameStarted")
+          break;
+        default:
+          console.log("nothing here");
+      }
+    }
+  }, [message]);
 
   const initGame = async () => {
     /**
@@ -66,12 +89,34 @@ const GameScreen = ({ route, navigation }) => {
   };
 
   const FinishSetup = async () => {
-    //run checks
-    //initialize game
-    setFinishMessage("Looking for opponents ...");
-  };
+    /**
+     * Init game
+     */
 
-  const rescale = (corners) => {};
+    switch (setupStage) {
+      case "CheckCorners":
+        setSetupStage("PutPieces");
+        setSetupMessage(
+          "Now place pieces on the board, white on the right side and black on the left side"
+        );
+        break;
+      case "PutPieces":
+        setSetupStage("Finished");
+        setSetupMessage("Waiting for opponent ...");
+
+        if (config.gametype === "invite") {
+          const action = {
+            type: "challengeDirectly",
+            data: {
+              username: config.username,
+            },
+          };
+          sendMessage(action);
+        }
+
+        break;
+    }
+  };
 
   const frameProcessor = useFrameProcessor(
     (frame) => {
@@ -80,33 +125,41 @@ const GameScreen = ({ route, navigation }) => {
       /**
        * Frames are rotated by 90deg
        */
-      const xscale = windowWidth / frame.height;
-      const yscale = 640 / frame.width;
-      console.log("xscale: ", xscale)
-      console.log("yscale: ", yscale)
 
-      console.log("framewidth: ", frame.width)
-      console.log("framehgeight: ", frame.height)
-      const corners = JSON.parse(CheckCamera(frame));
-      console.log("corners:", corners);
-      console.log("corners1:", corners[0]);
-      corner1.value = {
-        x: corners[0][0] * yscale,
-        y: corners[0][1] * xscale,
-      };
-      corner2.value = {
-        x: corners[1][0] * yscale,
-        y: corners[1][1] * xscale,
-      };
-      corner3.value = {
-        x: corners[2][0] * yscale,
-        y: corners[2][1] * xscale,
-      };
-      corner4.value = {
-        x: corners[3][0] * yscale,
-        y: corners[3][1] * xscale,
-      };
+      switch (setupStage){
+        case "CheckCorners":
+          const xscale = windowWidth / frame.height;
+          const yscale = windowWidth / 0.5625 / frame.width;
+          const corners = JSON.parse(CheckCamera(frame));
 
+          console.log("xscale: ", xscale);
+          console.log("yscale: ", yscale);
+          console.log("framewidth: ", frame.width);
+          console.log("framehgeight: ", frame.height);
+
+          corner1.value = {
+            x: corners[0][0] * yscale,
+            y: corners[0][1] * xscale,
+          };
+          corner2.value = {
+            x: corners[1][0] * yscale,
+            y: corners[1][1] * xscale,
+          };
+          corner3.value = {
+            x: corners[2][0] * yscale,
+            y: corners[2][1] * xscale,
+          };
+          corner4.value = {
+            x: corners[3][0] * yscale,
+            y: corners[3][1] * xscale,
+          };
+          break;
+
+        /**
+         * 
+         */
+        case "GameStarted"
+      }    
       // const generatedMove = GenerateMove(frame);
       // console.log("generated Move: ", generatedMove);
       // console.log(frame.height, windowHeight)
@@ -127,7 +180,7 @@ const GameScreen = ({ route, navigation }) => {
     }),
     [corner1]
   );
-   const corner2Style = useAnimatedStyle(
+  const corner2Style = useAnimatedStyle(
     () => ({
       position: "absolute",
       width: 10,
@@ -139,7 +192,7 @@ const GameScreen = ({ route, navigation }) => {
     }),
     [corner2]
   );
- const corner3Style = useAnimatedStyle(
+  const corner3Style = useAnimatedStyle(
     () => ({
       position: "absolute",
       width: 10,
@@ -151,7 +204,7 @@ const GameScreen = ({ route, navigation }) => {
     }),
     [corner3]
   );
- const corner4Style = useAnimatedStyle(
+  const corner4Style = useAnimatedStyle(
     () => ({
       position: "absolute",
       width: 10,
@@ -172,50 +225,34 @@ const GameScreen = ({ route, navigation }) => {
           <>
             {device ? (
               <Camera
-                style={[StyleSheet.absoluteFill, { aspectRatio: 0.5625, height: 640 }]}
+                style={[
+                  StyleSheet.absoluteFill,
+                  { aspectRatio: 0.5625, height: windowWidth / 0.5625 },
+                ]}
                 device={device}
                 isActive={true}
                 frameProcessor={frameProcessor}
-                frameProcessorFps={1}
+                frameProcessorFps={0.5}
               ></Camera>
             ) : (
               <></>
             )}
-            <Text style={{ fontSize: 20, fontWeight: "600", color: "#f11625" }}>
-              Place the camera still at the side of the board, check if the
-              board edges are drawn detected correctly
-            </Text>
-
+            <View style={{ backgroundColor: "rgba(0,0,0,0.4)" }}>
+              <Text style={{ fontSize: 20, fontWeight: "600", color: "white" }}>
+                {setupMessage}
+              </Text>
+            </View>
             <Box justifyContent={"center"} alignItems="center" top={"60%"}>
-              {!finishedSetup ? (
-                <>
-                  <Button
-                    rounded={"full"}
-                    alignSelf={"center"}
-                    position="relative"
-                    size={"lg"}
-                    onPress={FinishSetup}
-                    zIndex={10}
-                  >
-                    Start Game
-                  </Button>
-                  {finishmessage !== "" && (
-                    <Badge
-                      colorScheme="info"
-                      rounded={"full"}
-                      variant="outline"
-                    >
-                      <Text
-                        style={{ fontSize: 30, padding: 10, color: "white" }}
-                      >
-                        {finishmessage}
-                      </Text>
-                    </Badge>
-                  )}
-                </>
-              ) : (
-                <></>
-              )}
+              <Button
+                rounded={"full"}
+                alignSelf={"center"}
+                position="relative"
+                size={"lg"}
+                onPress={FinishSetup}
+                zIndex={10}
+              >
+                {btntitle}
+              </Button>
             </Box>
           </>
         )}
