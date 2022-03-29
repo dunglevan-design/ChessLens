@@ -180,7 +180,8 @@ const GameScreen = ({ route, navigation }) => {
         case "MoveMade":
           //GenerateMove(frame, prevFrame, corner1.value.x, corner1.value.y, corner2.value.x, corner2.value.y,  corner3.value.x, corner3.value.y,  corner4.value.x, corner4.value.y)
           // Go back to standby mode, waiting for moves.
-          runOnJS(() => setSetupStage("WaitingForMove"));
+          console.log("made move E4")
+          runOnJS(setSetupStage)("WaitingForMove");
           break;
 
         default:
@@ -280,7 +281,7 @@ const GameScreen = ({ route, navigation }) => {
                 {btntitle}
               </Button>
 
-              {setupStage == "GameStarted" && (
+              {setupStage == "WaitingForMove" && (
                 <Button
                   rounded={"full"}
                   alignSelf={"center"}

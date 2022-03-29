@@ -183,10 +183,9 @@ android {
     }
 
     packagingOptions {
+        pickFirst '**/*.so'
         exclude('META-INF/native-image/android-x86_64/jnijavacpp/jni-config.json')
         exclude('META-INF/native-image/android-x86_64/jnijavacpp/reflect-config.json')
-
-
         exclude('META-INF/native-image/android-arm64/jnijavacpp/jni-config.json')
         exclude('META-INF/native-image/android-arm64/jnijavacpp/reflect-config.json')
     }
