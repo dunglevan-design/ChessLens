@@ -10,10 +10,15 @@ import android.renderscript.RenderScript;
 import android.renderscript.ScriptIntrinsicYuvToRGB;
 import android.renderscript.Type;
 
+import org.bytedeco.javacv.AndroidFrameConverter;
+import org.bytedeco.javacv.Frame;
+import org.bytedeco.javacv.OpenCVFrameConverter;
+import org.bytedeco.opencv.opencv_core.Mat;
+
 import java.nio.ByteBuffer;
 
 public class utils {
-    public static Bitmap yuv420ToBitmap(Image image, Context context) {
+    public static Mat yuv420ToMat(Image image, Context context) {
         RenderScript rs = RenderScript.create(context);
         ScriptIntrinsicYuvToRGB script = ScriptIntrinsicYuvToRGB.create(rs, Element.U8_4(rs));
 
@@ -36,7 +41,12 @@ public class utils {
 
         Bitmap bitmap = Bitmap.createBitmap(image.getWidth(), image.getHeight(), Bitmap.Config.ARGB_8888);
         out.copyTo(bitmap);
-        return bitmap;
+
+        AndroidFrameConverter converterToFrame = new AndroidFrameConverter();
+        Frame frame = converterToFrame.convert(bitmap);
+        OpenCVFrameConverter.ToMat converterToMat = new OpenCVFrameConverter.ToMat();
+        Mat mat = converterToMat.convert(frame);
+        return mat;
     }
 
     public static byte[] image2byteArray(Image image) {

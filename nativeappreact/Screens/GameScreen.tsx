@@ -8,6 +8,7 @@ import { View, Text, StyleSheet, Dimensions } from "react-native";
 import React, { useEffect, useState } from "react";
 import {
   Camera,
+  Frame,
   useCameraDevices,
   useFrameProcessor,
 } from "react-native-vision-camera";
@@ -16,6 +17,7 @@ import { useAuth } from "../components/ContextProviders/AuthContext";
 import axios from "axios";
 import { CheckCamera, GenerateMove } from "../utils/FrameProcessorPlugins";
 import Animated, {
+  runOnJS,
   useAnimatedStyle,
   useSharedValue,
 } from "react-native-reanimated";
@@ -39,6 +41,7 @@ const GameScreen = ({ route, navigation }) => {
     "Place the camera still at the side of the board, check if the board corners are drawn correctly"
   );
   const [setupStage, setSetupStage] = useState("CheckCorners");
+  const [prevFrame, setPrevFrame] = useState<Frame>();
 
   const corner1 = useSharedValue({ x: 0, y: 0 });
   const corner2 = useSharedValue({ x: 0, y: 0 });
@@ -153,13 +156,27 @@ const GameScreen = ({ route, navigation }) => {
           break;
 
         /**
-         *
+         * first frame come in when game started. This frame is saved as prevFrame to compare to find moves
          */
         case "GameStarted":
+          runOnJS(() => {
+            setPrevFrame(frame);
+            setSetupStage("WaitingForMove")
+          });
           break;
-          case "MoveMade":
-            setSetupStage("MoveBeingMade");
-            // GenerateMove(frame, [prevImg, corner1.value, corner2.value, corner3.value, corner4.value])
+        case "WaitingForMove":
+          console.log("wating for move")
+          break;
+
+        /**
+         * Move has been made, get compare the prevFrame with the current frame in Native thread
+         * Update states on JS
+         * set prevFrame = currentFrame if the move is made sucessfully.
+         */
+        case "MoveMade":
+          // Go back to standby mode, waiting for moves.
+          runOnJS(() => setSetupStage("WaitingForMove"));
+          // GenerateMove(frame, [prevImg, corner1.value, corner2.value, corner3.value, corner4.value])
 
           break;
       }

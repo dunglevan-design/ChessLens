@@ -1,6 +1,6 @@
 package com.nativeappreact;
 import static com.nativeappreact.utils.yuv420ToBitmap;
-
+import static com.nativeappreact.utils.yuv420ToMat;
 
 
 import android.annotation.SuppressLint;
@@ -43,22 +43,6 @@ public class MoveGeneratorPlugin extends FrameProcessorPlugin{
         this.context = context.getApplicationContext();
     }
 
-    public void print(Mat mat){
-        UByteRawIndexer sI = mat.createIndexer();
-        List<List<Integer>> values = new ArrayList<>();
-
-        for(int y = 0; y < mat.rows(); y++){
-            List<Integer> rows = new ArrayList<>();
-            for (int x = 0; x < mat.cols(); x ++){
-                rows.add(sI.get(y,x));
-            }
-            values.add(rows);
-        }
-
-        System.out.println("opencv " + values);
-    }
-
-
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Nullable
@@ -66,17 +50,21 @@ public class MoveGeneratorPlugin extends FrameProcessorPlugin{
     public Object callback(@NonNull androidx.camera.core.ImageProxy image, @NonNull Object[] params) {
 
         Instant start = Instant.now();
-        @SuppressLint("UnsafeOptInUsageError") Bitmap bmp = yuv420ToBitmap(image.getImage(), context);
-        System.out.println("worked here opencv");
-        AndroidFrameConverter converterToFrame = new AndroidFrameConverter();
-        Frame frame = converterToFrame.convert(bmp);
-        OpenCVFrameConverter.ToMat converterToMat = new OpenCVFrameConverter.ToMat();
-        Mat mat = converterToMat.convert(frame);
-        System.out.println("opencv" + mat.size() );
+        ImageProxy prevImage = (ImageProxy) params[0];
+        @SuppressLint("UnsafeOptInUsageError") Mat currFrame = yuv420ToMat(image.getImage(), context);
+        @SuppressLint("UnsafeOptInUsageError") Mat prevFrame = yuv420ToMat(prevImage.getImage(), context);
+
+
+
+
+
+
+
+
 
         Instant finish = Instant.now();
         long timeElapsed = Duration.between(start, finish).toMillis();
 
-        return "hello" + mat.toString() + timeElapsed;
+        return "hello" + timeElapsed;
     }
 }
