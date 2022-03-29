@@ -97,4 +97,13 @@ public class utils {
         }
         return nv21;
     }
+
+    public static Bitmap MattobitmapConvert(Mat mat){
+        OpenCVFrameConverter.ToMat converterToMat = new OpenCVFrameConverter.ToMat();
+        Frame frame = converterToMat.convert(mat);
+        AndroidFrameConverter converterToBitmap = new AndroidFrameConverter();
+        Bitmap bitmap = converterToBitmap.convert(frame);
+
+        return bitmap;
+    }
 }

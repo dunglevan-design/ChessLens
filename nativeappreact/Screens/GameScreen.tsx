@@ -73,6 +73,7 @@ const GameScreen = ({ route, navigation }) => {
         case "startGame":
           console.log("start game");
           setSetupStage("GameStarted");
+          setSetupMessage("");
           break;
         default:
           console.log("nothing here");
@@ -174,10 +175,9 @@ const GameScreen = ({ route, navigation }) => {
          * set prevFrame = currentFrame if the move is made sucessfully.
          */
         case "MoveMade":
+          GenerateMove(frame, prevFrame, corner1.value.x, corner1.value.y, corner2.value.x, corner2.value.y,  corner3.value.x, corner3.value.y,  corner4.value.x, corner4.value.y)
           // Go back to standby mode, waiting for moves.
           runOnJS(() => setSetupStage("WaitingForMove"));
-          // GenerateMove(frame, [prevImg, corner1.value, corner2.value, corner3.value, corner4.value])
-
           break;
       }
       // const generatedMove = GenerateMove(frame);
@@ -185,7 +185,7 @@ const GameScreen = ({ route, navigation }) => {
       // console.log(frame.height, windowHeight)
       // console.log(frame.width, windowWidth)
     },
-    [corner1, corner2, corner3, corner4]
+    [corner1, corner2, corner3, corner4, setupStage]
   );
 
   const corner1Style = useAnimatedStyle(

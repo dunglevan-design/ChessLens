@@ -1,6 +1,6 @@
 package com.nativeappreact;
 
-import static com.nativeappreact.utils.yuv420ToBitmap;
+import static com.nativeappreact.utils.yuv420ToMat;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -56,20 +56,14 @@ public class CameraCheckPlugin extends FrameProcessorPlugin {
     @Nullable
     @Override
     public Object callback(@NonNull ImageProxy image, @NonNull Object[] params) {
-        @SuppressLint("UnsafeOptInUsageError") Bitmap bmp = yuv420ToBitmap(image.getImage(), context);
-        System.out.println("worked here opencv");
-        AndroidFrameConverter converterToFrame = new AndroidFrameConverter();
-        Frame frame = converterToFrame.convert(bmp);
-        OpenCVFrameConverter.ToMat converterToMat = new OpenCVFrameConverter.ToMat();
-        Mat mat = converterToMat.convert(frame);
-
+        @SuppressLint("UnsafeOptInUsageError") Mat mat = yuv420ToMat(image.getImage(), context);
+        System.out.println("hello work here");
         Mat corners = findCorner(mat);
         if(corners.empty()) {
             System.out.println("empty corners");
             int [][] placeholders = {{0,0}, {0,0}, {0,0}, {0,0}};
-            return placeholders;
+            return new Gson().toJson(placeholders);
         }
-
 
         /** Perspective transform */
         Mat newmat = new Mat(4,2, opencv_core.CV_32F, new Scalar(0));
@@ -93,10 +87,7 @@ public class CameraCheckPlugin extends FrameProcessorPlugin {
          * Inverse warpPerspective to find outer corners
          */
         Mat outerCorners = new Mat(3,4, opencv_core.CV_64FC1, new Scalar(0));
-        Mat RevertedouterCorners = new Mat(3,4, opencv_core.CV_64FC1, new Scalar(0));
-
         DoubleRawIndexer outerCornerIndexer = outerCorners.createIndexer();
-        DoubleRawIndexer RevertedouterCornerIndexer = RevertedouterCorners.createIndexer();
 
         outerCornerIndexer.put(0,0, 800);
         outerCornerIndexer.put(1,0, 0);
@@ -114,11 +105,6 @@ public class CameraCheckPlugin extends FrameProcessorPlugin {
         outerCornerIndexer.put(1,3, 800);
         outerCornerIndexer.put(2,3, 1);
 
-//                Mat testpoint = new Mat(3, 1, opencv_core.CV_64FC1, new Scalar(0));
-//                DoubleRawIndexer dindexer = testpoint.createIndexer();
-//                dindexer.put(0,0, 0);
-//                dindexer.put(1, 0, 0);
-//                dindexer.put(2,0,1);
 
         Mat hemo = new Mat();
         opencv_core.gemm(perspective.inv().asMat().t().asMat(), outerCorners,
@@ -150,15 +136,6 @@ public class CameraCheckPlugin extends FrameProcessorPlugin {
         return new Gson().toJson(outerCornersArr);
     }
 
-    public Bitmap MattobitmapConvert(Mat mat){
-
-        OpenCVFrameConverter.ToMat converterToMat = new OpenCVFrameConverter.ToMat();
-        Frame frame = converterToMat.convert(mat);
-        AndroidFrameConverter converterToBitmap = new AndroidFrameConverter();
-        Bitmap bitmap = converterToBitmap.convert(frame);
-
-        return bitmap;
-    }
 
     public Mat findCorner(Mat mat){
         Mat Points = new Mat(4,2, opencv_core.CV_32F);
@@ -167,7 +144,10 @@ public class CameraCheckPlugin extends FrameProcessorPlugin {
         boolean found = opencv_calib3d.findChessboardCorners(mat, new Size(7, 7),
                 corners, opencv_calib3d.CALIB_CB_ADAPTIVE_THRESH + opencv_calib3d.CALIB_CB_NORMALIZE_IMAGE);
 
-        if (!found) return corners;
+        if (!found) {
+            System.out.println("opencv : not found corners");
+            return corners;
+        }
         opencv_calib3d.drawChessboardCorners(mat, new Size(7,7), corners, found);
 
         int x;
@@ -205,45 +185,5 @@ public class CameraCheckPlugin extends FrameProcessorPlugin {
         return Points;
     }
 
-//
-//    public ArrayList<ArrayList<Float>> findCorner(Mat mat){
-//        ArrayList<ArrayList<Float>> Points = new ArrayList<>();
-//        Mat corners = new Mat();
-//        boolean found = opencv_calib3d.findChessboardCorners(mat, new Size(7, 7),
-//                corners, opencv_calib3d.CALIB_CB_ADAPTIVE_THRESH + opencv_calib3d.CALIB_CB_NORMALIZE_IMAGE);
-//        opencv_calib3d.drawChessboardCorners(mat, new Size(7,7), corners, found);
-//
-//        Float x;
-//        Float y;
-//        ArrayList<Float> corner1 = new ArrayList<>(), corner2 = new ArrayList<>() , corner3 = new ArrayList<>(), corner4 = new ArrayList<>();
-//        FloatRawIndexer indexer = corners.createIndexer();
-//
-//        x = indexer.get(0, 0, 0);
-//        y = indexer.get(0, 0, 1);
-//        corner1.add(x);
-//        corner1.add(y);
-//
-//        x = indexer.get(6, 0, 0);
-//        y = indexer.get(6, 0, 1);
-//        corner2.add(x);
-//        corner2.add(y);
-////
-//        x = indexer.get(42, 0, 0);
-//        y = indexer.get(42, 0, 1);
-//        corner3.add(x);
-//        corner3.add(y);
-//
-//        x = indexer.get(48, 0, 0);
-//        y = indexer.get(48, 0, 1);
-//        corner4.add(x);
-//        corner4.add(y);
-//
-//        Points.add(corner1);
-//        Points.add(corner2);
-//        Points.add(corner3);
-//        Points.add(corner4);
-//
-//        return Points;
-//    }
 
 }
