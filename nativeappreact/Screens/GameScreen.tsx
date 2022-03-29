@@ -81,12 +81,14 @@ const GameScreen = ({ route, navigation }) => {
     }
   }, [message]);
 
-  const initGame = async () => {
+  const initGame = (frame:Frame) => {
     /**
      * Render game view on top of the camera.
      * for testing, camera view for now
      */
     console.log("config: ", config);
+    setPrevFrame(frame);
+    setSetupStage("WaitingForMove");
   };
 
   const FinishSetup = async () => {
@@ -112,10 +114,13 @@ const GameScreen = ({ route, navigation }) => {
               username: config.username,
             },
           };
+          console.log("challenge ", config.username);
           sendMessage(action);
         }
 
         break;
+      default:
+        console.log("useless button")
     }
   };
 
@@ -160,13 +165,11 @@ const GameScreen = ({ route, navigation }) => {
          * first frame come in when game started. This frame is saved as prevFrame to compare to find moves
          */
         case "GameStarted":
-          runOnJS(() => {
-            setPrevFrame(frame);
-            setSetupStage("WaitingForMove")
-          });
+          console.log("it is working here 166")
+          runOnJS(initGame)(frame);
           break;
         case "WaitingForMove":
-          console.log("wating for move")
+          console.log("wating for move");
           break;
 
         /**
@@ -175,10 +178,13 @@ const GameScreen = ({ route, navigation }) => {
          * set prevFrame = currentFrame if the move is made sucessfully.
          */
         case "MoveMade":
-          GenerateMove(frame, prevFrame, corner1.value.x, corner1.value.y, corner2.value.x, corner2.value.y,  corner3.value.x, corner3.value.y,  corner4.value.x, corner4.value.y)
+          //GenerateMove(frame, prevFrame, corner1.value.x, corner1.value.y, corner2.value.x, corner2.value.y,  corner3.value.x, corner3.value.y,  corner4.value.x, corner4.value.y)
           // Go back to standby mode, waiting for moves.
           runOnJS(() => setSetupStage("WaitingForMove"));
           break;
+
+        default:
+          console.log("doing nothing");
       }
       // const generatedMove = GenerateMove(frame);
       // console.log("generated Move: ", generatedMove);
