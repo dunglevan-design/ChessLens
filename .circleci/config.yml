@@ -42,9 +42,12 @@ jobs:
           name: chmod permissions
           command: chmod +x ./gradlew
       - run:
-          name: Assemble release build
+          name: Install dependencies
+          command: npm ci
+      - run:
+          name: EAS build for Android 
           command: |
-            ./gradlew assembleRelease
+            npx eas-cli build --platform android --non-interactive
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
