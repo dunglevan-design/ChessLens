@@ -12,8 +12,10 @@ import androidx.annotation.Nullable;
 import androidx.camera.core.ImageProxy;
 
 import com.facebook.react.bridge.ReactApplicationContext;
+import com.google.gson.Gson;
 import com.mrousavy.camera.frameprocessor.FrameProcessorPlugin;
 
+import org.bytedeco.javacpp.indexer.DoubleRawIndexer;
 import org.bytedeco.javacpp.indexer.FloatRawIndexer;
 import org.bytedeco.javacv.AndroidFrameConverter;
 import org.bytedeco.javacv.Frame;
@@ -28,6 +30,8 @@ import org.bytedeco.opencv.opencv_core.Size;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import expo.modules.core.MapHelper;
 
 public class CameraCheckPlugin extends FrameProcessorPlugin {
     /**
@@ -60,30 +64,84 @@ public class CameraCheckPlugin extends FrameProcessorPlugin {
         Mat mat = converterToMat.convert(frame);
 
         Mat corners = findCorner(mat);
-        Floatprint(corners);
 
+        /** Perspective transform */
+        Mat newmat = new Mat(4,2, opencv_core.CV_32F, new Scalar(0));
+        FloatRawIndexer indexer = newmat.createIndexer();
+        indexer.put(0,0, 700);
+        indexer.put(0,1, 100);
 
-        FloatRawIndexer cornerIndexer = corners.createIndexer();
-        opencv_imgproc.circle(mat, new Point((int) cornerIndexer.
-                        get(0, 0), (int) cornerIndexer.get(0, 1)), 50,
-                new Scalar(255, 0, 0, 0), 50, 0, 0);
-        opencv_imgproc.circle(mat, new Point((int) cornerIndexer.
-                        get(1, 0), (int) cornerIndexer.get(1, 1)), 50,
-                new Scalar(0, 255, 0, 0), 50, 0, 0);
-        opencv_imgproc.circle(mat, new Point((int) cornerIndexer.
-                        get(2, 0), (int) cornerIndexer.get(2, 1)), 50,
-                new Scalar(0, 0, 255, 0), 50, 0, 0);
-        opencv_imgproc.circle(mat, new Point((int) cornerIndexer.
-                        get(3, 0), (int) cornerIndexer.get(3, 1)), 50,
-                new Scalar(122, 122, 122, 0), 50, 0, 0);
+        indexer.put(1,0, 700);
+        indexer.put(1,1, 700);
 
+        indexer.put(2,0, 100);
+        indexer.put(2,1, 100);
 
-        opencv_imgproc.circle(mat, new Point(1279,719), 50,
-                new Scalar(122, 122, 122, 0), 50, 0, 0);
-        Bitmap bitmap = MattobitmapConvert(mat);
+        indexer.put(3,0, 100);
+        indexer.put(3,1, 700);
+        Mat perspective = opencv_imgproc.getPerspectiveTransform(corners, newmat);
+        Mat transformed = new Mat();
+        opencv_imgproc.warpPerspective(mat, transformed, perspective, new Size(800, 800));
 
-        System.out.println("opencv + coompdjf");
-        return "Camera Check";
+        /**
+         * Inverse warpPerspective to find outer corners
+         */
+        Mat outerCorners = new Mat(3,4, opencv_core.CV_64FC1, new Scalar(0));
+        Mat RevertedouterCorners = new Mat(3,4, opencv_core.CV_64FC1, new Scalar(0));
+
+        DoubleRawIndexer outerCornerIndexer = outerCorners.createIndexer();
+        DoubleRawIndexer RevertedouterCornerIndexer = RevertedouterCorners.createIndexer();
+
+        outerCornerIndexer.put(0,0, 800);
+        outerCornerIndexer.put(1,0, 0);
+        outerCornerIndexer.put(2,0, 1);
+
+        outerCornerIndexer.put(0,1, 800);
+        outerCornerIndexer.put(1,1, 800);
+        outerCornerIndexer.put(2,1, 1);
+
+        outerCornerIndexer.put(0,2, 0);
+        outerCornerIndexer.put(1,2, 0);
+        outerCornerIndexer.put(2,2, 1);
+
+        outerCornerIndexer.put(0,3, 0);
+        outerCornerIndexer.put(1,3, 800);
+        outerCornerIndexer.put(2,3, 1);
+
+//                Mat testpoint = new Mat(3, 1, opencv_core.CV_64FC1, new Scalar(0));
+//                DoubleRawIndexer dindexer = testpoint.createIndexer();
+//                dindexer.put(0,0, 0);
+//                dindexer.put(1, 0, 0);
+//                dindexer.put(2,0,1);
+
+        Mat hemo = new Mat();
+        opencv_core.gemm(perspective.inv().asMat().t().asMat(), outerCorners,
+                1, new Mat(), 0, hemo,
+                1);
+        DoubleRawIndexer hemoindexer = hemo.createIndexer();
+        Mat outercorner1 = hemo.col(0).mul(new Mat(3,1, opencv_core.CV_64FC1,
+                new Scalar(1)), 1/hemoindexer.get(2,0)).asMat();
+
+        Mat outercorner2 = hemo.col(1).mul(new Mat(3,1, opencv_core.CV_64FC1,
+                new Scalar(1)), 1/hemoindexer.get(2,1)).asMat();
+
+        Mat outercorner3 = hemo.col(2).mul(new Mat(3,1, opencv_core.CV_64FC1,
+                new Scalar(1)), 1/hemoindexer.get(2,2)).asMat();
+
+        Mat outercorner4 = hemo.col(3).mul(new Mat(3,1, opencv_core.CV_64FC1,
+                new Scalar(1)), 1/hemoindexer.get(2,3)).asMat();
+        DoubleRawIndexer outercorner1indexer = outercorner1.createIndexer();
+        DoubleRawIndexer outercorner2indexer = outercorner2.createIndexer();
+        DoubleRawIndexer outercorner3indexer = outercorner3.createIndexer();
+        DoubleRawIndexer outercorner4indexer = outercorner4.createIndexer();
+
+        int[][] outerCornersArr = {
+                {(int)Math.round(outercorner1indexer.get(0,0)), (int)Math.round(outercorner1indexer.get(1,0))},
+                {(int)Math.round(outercorner2indexer.get(0,0)), (int)Math.round(outercorner2indexer.get(1,0))},
+                {(int)Math.round(outercorner3indexer.get(0,0)), (int)Math.round(outercorner3indexer.get(1,0))},
+                {(int)Math.round(outercorner4indexer.get(0,0)), (int)Math.round(outercorner4indexer.get(1,0))},
+        };
+        return new Gson().toJson(outerCornersArr);
     }
 
     public Bitmap MattobitmapConvert(Mat mat){
@@ -139,18 +197,45 @@ public class CameraCheckPlugin extends FrameProcessorPlugin {
         return Points;
     }
 
-    public void Floatprint(Mat mat){
-        FloatRawIndexer sI = mat.createIndexer();
-        List<List<Integer>> values = new ArrayList<>();
+//
+//    public ArrayList<ArrayList<Float>> findCorner(Mat mat){
+//        ArrayList<ArrayList<Float>> Points = new ArrayList<>();
+//        Mat corners = new Mat();
+//        boolean found = opencv_calib3d.findChessboardCorners(mat, new Size(7, 7),
+//                corners, opencv_calib3d.CALIB_CB_ADAPTIVE_THRESH + opencv_calib3d.CALIB_CB_NORMALIZE_IMAGE);
+//        opencv_calib3d.drawChessboardCorners(mat, new Size(7,7), corners, found);
+//
+//        Float x;
+//        Float y;
+//        ArrayList<Float> corner1 = new ArrayList<>(), corner2 = new ArrayList<>() , corner3 = new ArrayList<>(), corner4 = new ArrayList<>();
+//        FloatRawIndexer indexer = corners.createIndexer();
+//
+//        x = indexer.get(0, 0, 0);
+//        y = indexer.get(0, 0, 1);
+//        corner1.add(x);
+//        corner1.add(y);
+//
+//        x = indexer.get(6, 0, 0);
+//        y = indexer.get(6, 0, 1);
+//        corner2.add(x);
+//        corner2.add(y);
+////
+//        x = indexer.get(42, 0, 0);
+//        y = indexer.get(42, 0, 1);
+//        corner3.add(x);
+//        corner3.add(y);
+//
+//        x = indexer.get(48, 0, 0);
+//        y = indexer.get(48, 0, 1);
+//        corner4.add(x);
+//        corner4.add(y);
+//
+//        Points.add(corner1);
+//        Points.add(corner2);
+//        Points.add(corner3);
+//        Points.add(corner4);
+//
+//        return Points;
+//    }
 
-        for(int y = 0; y < mat.rows(); y++){
-            List<Integer> rows = new ArrayList<>();
-            for (int x = 0; x < mat.cols(); x ++){
-                rows.add((int) sI.get(y,x));
-            }
-            values.add(rows);
-        }
-
-        System.out.println("opencv " + values);
-    }
 }

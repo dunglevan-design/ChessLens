@@ -2,7 +2,7 @@ import type { Frame } from "react-native-vision-camera";
 
 
 declare global {
-  var __CheckCamera: (frame: Frame) => string | string[] | number;
+  var __CheckCamera: (frame: Frame) => string;
   var __GenerateMove: (frame: Frame) => string | string[] | undefined | null;
 }
 
