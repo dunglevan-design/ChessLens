@@ -17,7 +17,7 @@ jobs:
   build-and-test:
     # These next lines define the Android machine image executor.
     # See: https://circleci.com/docs/2.0/executor-types/
-    working_directory: ~/ChessLens/nativeappreact/android
+    working_directory: ~/ChessLens/nativeappreact
     executor:
       name: android/android-machine
 
@@ -43,7 +43,7 @@ jobs:
           command: chmod +x ./gradlew
       - run:
           name: Install dependencies
-          command: npm ci
+          command: yarn install --frozen-lockfile
       - run:
           name: EAS build for Android 
           command: |
