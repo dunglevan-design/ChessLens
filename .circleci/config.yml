@@ -11,15 +11,22 @@ orbs:
 
 # Define a job to be invoked later in a workflow.
 # See: https://circleci.com/docs/2.0/configuration-reference/#jobs
+
+
+executors:
+  machine:
+    docker:
+      - image: cimg/node:lts
+
+
 jobs:
   # Below is the definition of your job to build and test your app, you can rename and customize it as you want.
   
   build-and-test:
     # These next lines define the Android machine image executor.
     # See: https://circleci.com/docs/2.0/executor-types/
-    working_directory: ~/ChessLens/nativeappreact/android
-    executor:
-      name: android/android-machine
+    working_directory: ~/ChessLens/nativeappreact
+    executor: machine
 
     # Add steps to the job
     # See: https://circleci.com/docs/2.0/configuration-reference/#steps
@@ -28,23 +35,14 @@ jobs:
       - checkout:
          path: ~/ChessLens
 
-      # The next step will run the unit tests
-      # - android/run-tests:
-      #     test-command: ./gradlew lint testDebug --continue
-
-      # Then start the emulator and run the Instrumentation tests!
-      # - android/start-emulator-and-run-tests:
-      #     test-command: ./gradlew connectedDebugAndroidTest
-      #     system-image: system-images;android-25;google_apis;x86
-
-      # And finally run the release build
-      - run: 
-          name: chmod permissions
-          command: chmod +x ./gradlew
       - run:
-          name: Assemble release build
+          name: Install dependencies
+          command: yarn install --frozen-lockfile
+          
+      - run:
+          name: EAS build for Android 
           command: |
-            ./gradlew assembleRelease
+            npx eas-cli build --platform android --non-interactive
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
