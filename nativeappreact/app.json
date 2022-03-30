@@ -7,9 +7,16 @@
     "assetBundlePatterns": [
       "**/*"
     ],
+    "jsEngine": "hermes",
     "plugins": [
       "react-native-vision-camera"
-    ]
+    ],
+    "android": {
+      "permissions": [
+        "android.permission.CAMERA"
+      ],
+      "package": "com.dunglevancode.nativeappreact"
+    }
   },
   "name": "nativeappreact"
 }
