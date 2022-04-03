@@ -7,6 +7,7 @@ import React, {
   useState,
 } from "react";
 import { useAuth } from "./AuthContext";
+import { action, config, msgfromSocketHOC } from "../utils/types";
 
 type context = {
     message: msgfromSocketHOC,
@@ -54,6 +55,7 @@ const SocketContext = ({ children }) => {
 
   useEffect(() => {
     ws.onopen = () => {
+      console.log("connection")
       const action = {
         type: "init",
         message: "init connection, user not signed in",

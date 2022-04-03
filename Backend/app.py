@@ -66,7 +66,7 @@ async def producer_handler(websocket, client:berserk.clients.Client, board:berse
     
 async def start(websocket, token:string):
     # create client session to lichess API
-    session = OAuth2Session("nativeappreact", token={"access_token": "lio_Fw5iaQKZt1tT2x0Xgvo8dCta4JnrfGf8"})
+    session = OAuth2Session("jsapp6", token={"access_token": token})
     client = berserk.clients.Client(session)
     board = berserk.clients.Board(session)
 

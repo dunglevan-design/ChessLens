@@ -2,6 +2,8 @@ package com.jsapp6;
 
 import android.view.SurfaceView;
 
+import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.common.MapBuilder;
 import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.ThemedReactContext;
 
@@ -21,6 +23,10 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.view.SurfaceView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
@@ -38,20 +44,25 @@ import org.opencv.android.LoaderCallbackInterface;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class JavaCameraViewManager extends SimpleViewManager<FrameLayout>
         implements CameraBridgeViewBase.CvCameraViewListener2 {
     public static final String REACT_CLASS = "JavaCameraView";
     public CameraBridgeViewBase cameraBridgeViewBase;
+    public final int COMMAND_CHECK_CORNERS = 1;
     private Mat mRgba;
     private Mat mIntermediateMat;
     private Mat mGray;
+    private String ProcessingMode = "";
     Mat newm;
     Mat rsnewm;
     @Override
     public String getName() {
         return REACT_CLASS;
     }
+
+
     @Override
     public FrameLayout createViewInstance(ThemedReactContext context) {
         LayoutInflater inflater = LayoutInflater.from(context);
@@ -63,6 +74,12 @@ public class JavaCameraViewManager extends SimpleViewManager<FrameLayout>
         cameraBridgeViewBase.setCvCameraViewListener(this);
         return preview;
     }
+
+    public void ReceiveCommand(String command){
+        System.out.println("opencv command received");
+        ProcessingMode = "CheckCorners";
+    }
+
     @Override
     public void onCameraViewStarted(int width, int height) {
 //        mRgba = new Mat(height, width, CvType.CV_8UC4);
@@ -73,6 +90,7 @@ public class JavaCameraViewManager extends SimpleViewManager<FrameLayout>
     @Override
     public void onCameraViewStopped() {
     }
+
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
 //        if(mRgba != null){
@@ -91,9 +109,21 @@ public class JavaCameraViewManager extends SimpleViewManager<FrameLayout>
         //Core.flip(mGray, mGray, -1); // rotates Mat to portrait
         Core.rotate(mRgba, newm, Core.ROTATE_90_CLOCKWISE);
         Imgproc.resize(newm, rsnewm, new Size(newm.height(), newm.width()));
+
+        switch (ProcessingMode) {
+            case "CheckCorners":
+                System.out.println("opencv I am checking corners");
+                break;
+            default:
+                System.out.println("opencv Currently not processing anything");
+        }
         System.out.println("opencv camera frame"+ mRgba.size().toString());
 
         return rsnewm;
+    }
+
+    public CameraBridgeViewBase getJavaCameraInstance() {
+        return cameraBridgeViewBase;
     }
 
 

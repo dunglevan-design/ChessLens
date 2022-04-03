@@ -6,6 +6,7 @@ import StackNavigator from './components/StackNavigator';
 import * as Linking from "expo-linking";
 
 import { JavaCameraView } from './native/OpenCVCamera';
+import SocketContext from './components/ContextProviders/SocketContext';
 
 
 const prefix = Linking.createURL("app");
@@ -24,9 +25,9 @@ export default function App() {
   return (
     <NavigationContainer linking={linking}>
         <AuthContext>
-          {/* <SocketContext> */}
+          <SocketContext>
             <StackNavigator />
-          {/* </SocketContext> */}
+          </SocketContext>
         </AuthContext>
     </NavigationContainer>
   );
