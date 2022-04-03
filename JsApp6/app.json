@@ -1,0 +1,11 @@
+{
+  "expo": {
+    "name": "JsApp6",
+    "slug": "JsApp6",
+    "version": "1.0.0",
+    "scheme": "com.jsapp6",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
