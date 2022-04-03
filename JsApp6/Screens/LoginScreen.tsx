@@ -1,16 +1,28 @@
-import React from "react";
+import React, { useState } from "react";
 import { useAuth } from "../components/ContextProviders/AuthContext";
 import * as Linking from "expo-linking";
 import {
   Image,
   Text,
   TextComponent,
+  ToastAndroid,
   TouchableOpacity,
   View,
 } from "react-native";
+import { Camera } from "expo-camera";
 
 const LoginScreen = () => {
   const { LoginWithLichess } = useAuth();
+  const [permission, setPermission] = useState(false)
+
+
+  const _requestCameraPermission = async() => {
+    const { status } = await Camera.requestCameraPermissionsAsync();
+    if (status === "granted"){
+        setPermission(status === 'granted');
+        ToastAndroid.show("Camera permission granted", ToastAndroid.SHORT)
+    }
+  }
 
   const Testlinking = async () => {
     const linkurl = "com.jsapp6://app/home";
@@ -38,7 +50,7 @@ const LoginScreen = () => {
         <Text style={{ fontSize: 16, fontWeight: "400", marginBottom: 1 }}>
           Chess Lens needs{" "}
           <Text style={{ fontWeight: "700" }}>Camera permission</Text>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => _requestCameraPermission()}>
             <Text style={{ color: "rgb(50,150,255)", fontWeight: "700" }}>
               Grant acess
             </Text>
@@ -48,8 +60,8 @@ const LoginScreen = () => {
         <Text style={{ fontSize: 16, fontWeight: "400", marginBottom: 1 }}>
           Chess Lens needs{" "}
           <Text style={{ fontWeight: "700" }}>a Lichess account</Text>
-          <TouchableOpacity>
-            <Text style={{ color: "rgb(50,150,255)", fontWeight: "700" }} onPress = {() => LoginWithLichess()}>
+          <TouchableOpacity onPress = {() => LoginWithLichess()}>
+            <Text style={{ color: "rgb(50,150,255)", fontWeight: "700" }}>
               Login with Lichess
             </Text>
           </TouchableOpacity>

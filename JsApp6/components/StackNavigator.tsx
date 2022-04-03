@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import LoginScreen from "../Screens/LoginScreen";
 import HomeScreen from "../Screens/HomeScreen";
 import { useAuth } from "./ContextProviders/AuthContext";
+import GameScreen from "../Screens/GameScreen";
 
 const Stack = createNativeStackNavigator();
 const StackNavigator = () => {
@@ -12,18 +13,17 @@ const StackNavigator = () => {
     <>
       <Stack.Navigator initialRouteName="Login">
         <Stack.Group
-          screenOptions={{ headerShown: false, headerTitleAlign: "center", headerStyle: {} }}
+          screenOptions={{ headerShown: false, headerStyle: {} }}
         >
           {!user ? (
             <Stack.Screen name="Login" component={LoginScreen} />
           ) : (
             <>
               <Stack.Screen name="Home" component={HomeScreen} />
-              {/* <Stack.Screen
+              <Stack.Screen
                 name="Game"
                 component={GameScreen}
-                options = {{headerShown: false}}
-              /> */}
+              />
             </>
           )}
         </Stack.Group>

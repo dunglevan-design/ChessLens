@@ -46,6 +46,8 @@ public class JavaCameraViewManager extends SimpleViewManager<FrameLayout>
     private Mat mRgba;
     private Mat mIntermediateMat;
     private Mat mGray;
+    Mat newm;
+    Mat rsnewm;
     @Override
     public String getName() {
         return REACT_CLASS;
@@ -63,9 +65,9 @@ public class JavaCameraViewManager extends SimpleViewManager<FrameLayout>
     }
     @Override
     public void onCameraViewStarted(int width, int height) {
-        mRgba = new Mat(height, width, CvType.CV_8UC4);
-        mIntermediateMat = new Mat(height, width, CvType.CV_8UC4);
-        mGray = new Mat(height, width, CvType.CV_8UC1);
+//        mRgba = new Mat(height, width, CvType.CV_8UC4);
+//        mIntermediateMat = new Mat(height, width, CvType.CV_8UC4);
+//        mGray = new Mat(height, width, CvType.CV_8UC1);
         System.out.println("opencv started");
     }
     @Override
@@ -73,16 +75,24 @@ public class JavaCameraViewManager extends SimpleViewManager<FrameLayout>
     }
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
-        mRgba = inputFrame.rgba();
-
+//        if(mRgba != null){
+//            mRgba.release();
+//        }
+//
+//        if(mGray != null){
+//            mGray.release();
+//        }
+        System.gc();
+        System.runFinalization();
+        mRgba = inputFrame.rgba().clone();
+        newm = new Mat();
+        rsnewm = new Mat();
         //Core.transpose(mGray, mGray);
         //Core.flip(mGray, mGray, -1); // rotates Mat to portrait
-        Mat newm = new Mat();
-        Mat rsnewm = new Mat();
         Core.rotate(mRgba, newm, Core.ROTATE_90_CLOCKWISE);
         Imgproc.resize(newm, rsnewm, new Size(newm.height(), newm.width()));
         System.out.println("opencv camera frame"+ mRgba.size().toString());
-// Frame processing code here
+
         return rsnewm;
     }
 
