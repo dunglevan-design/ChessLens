@@ -9,11 +9,11 @@ import com.facebook.react.bridge.ReactMethod;
 
 import org.opencv.android.CameraBridgeViewBase;
 
-public class JavaCameraModule extends ReactContextBaseJavaModule {
+public class JavaCameraControlModule extends ReactContextBaseJavaModule {
     //private CameraBridgeViewBase cameraBridgeViewBase;
     private JavaCameraViewManager javaCameraViewManager;
 
-    public JavaCameraModule(@Nullable ReactApplicationContext reactContext, JavaCameraViewManager javaCameraViewManager) {
+    public JavaCameraControlModule(@Nullable ReactApplicationContext reactContext, JavaCameraViewManager javaCameraViewManager) {
         super(reactContext);
         this.javaCameraViewManager = javaCameraViewManager;
     }
@@ -22,11 +22,11 @@ public class JavaCameraModule extends ReactContextBaseJavaModule {
     @NonNull
     @Override
     public String getName() {
-        return "JavaCameraModule";
+        return "JavaCameraControlModule";
     }
 
     @ReactMethod
-    public void PassCommandtoViewManager(String command) {
+    public void PassCommand(String command) {
         if (javaCameraViewManager  != null) {
             javaCameraViewManager.ReceiveCommand(command); // <-- Magic
         }

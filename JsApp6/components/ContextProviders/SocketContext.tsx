@@ -46,9 +46,10 @@ const SocketContext = ({ children }) => {
 
   const startGame = (config: config) => {
     setMessage({
-      action: "startGame",
+      action: "StartGame",
       data: config,
     });
+    
   };
 
   // End list of consumer functions on message
