@@ -71,8 +71,7 @@ const GameScreen = ({ route, navigation }) => {
           }
           break;
         case STAGE.GAME_STARTED:
-          SaveInitialFrame();
-          setStage(STAGE.WAITING_FOR_MY_MOVE);
+          SaveInitialFrameAndPredictMyMove();
           break;
         case STAGE.WAITING_FOR_MY_MOVE:
           PredictMyMove();
@@ -115,8 +114,9 @@ const GameScreen = ({ route, navigation }) => {
     JavaCameraControlModule.PassCommand("SaveCorners");
   };
 
-  const SaveInitialFrame = () => {
-    JavaCameraControlModule.PassCommand("SaveInitialFrame");
+  const SaveInitialFrameAndPredictMyMove = () => {
+    console.log("save initial frame getting called?")
+    JavaCameraControlModule.PassCommand("SaveInitialFrameAndPredictMyMove");
   };
 
   const PredictMyMove = () => {

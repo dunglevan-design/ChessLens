@@ -71,6 +71,8 @@ public class JavaCameraViewManager extends SimpleViewManager<FrameLayout>
     private Mat outerCorner4;
     private Mat InitialFrame;
 
+    private Integer frameCount;
+
     private ArrayList<Mat> prevFrames;
     private Mat prevFrame;
 
@@ -144,6 +146,8 @@ public class JavaCameraViewManager extends SimpleViewManager<FrameLayout>
 
         prevFrames = new ArrayList<Mat>();
         prevFrame = new Mat();
+
+        frameCount = 0;
         System.out.println("opencv started");
     }
     @Override
@@ -244,9 +248,15 @@ public class JavaCameraViewManager extends SimpleViewManager<FrameLayout>
                 }
                 break;
 
-            case "SaveInitialFrame":
-                InitialFrame = mRgba;
-                ProcessingMode = "";
+//            case "SaveInitialFrame":
+//                System.out.println("opencv Saving initial frame");
+//                InitialFrame = mGray.clone();
+//                ProcessingMode = "";
+//                break;
+            case "SaveInitialFrameAndPredictMyMove":
+                System.out.println("opencv Saving initial frame");
+                InitialFrame = mGray.clone();
+                ProcessingMode = "PredictMyMove";
                 break;
 
             case "PredictMyMove":
@@ -258,11 +268,11 @@ public class JavaCameraViewManager extends SimpleViewManager<FrameLayout>
                 break;
 
             case "WaitHandLeaveScreen":
-                WaitHandLeaveScreen();
+                WaitHandLeaveScreen(mGray);
                 break;
 
             case "GetMovePrediction":
-                GetMovePrediction();
+                GetMovePrediction(mGray);
                 break;
             default:
                 System.out.println("opencv Currently not processing anything, on standby mode: " + ProcessingMode);
@@ -286,17 +296,111 @@ public class JavaCameraViewManager extends SimpleViewManager<FrameLayout>
         return rsnewm;
     }
 
-    private void GetMovePrediction() {
+    private void GetMovePrediction(Mat mGray) {
         System.out.println("Getting Move prediction");
+        Mat correctedmInitial = new Mat();
+        Mat result = new Mat();
+        Mat dst = new Mat();
+        Mat threshHolded = new Mat();
+        Mat blurred = new Mat();
+        Imgproc.warpPerspective(mGray, correctedmGray, perspective, new Size(800, 800));
+        Imgproc.warpPerspective(InitialFrame, correctedmInitial, perspective, new Size(800, 800));
+
+        Core.absdiff(correctedmGray, correctedmInitial, result);
+        Mat kernel = Mat.ones(5,5,CvType.CV_32F);
+        Imgproc.morphologyEx(result, dst, Imgproc.MORPH_CLOSE, kernel);
+        //Imgproc.morphologyEx(result, dst, Imgproc.MORPH_OPEN, kernel);
+
+        bmp = Bitmap.createBitmap(correctedmGray.cols(), correctedmGray.rows(), Bitmap.Config.ARGB_8888);
+        Bitmap bmp2 = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
+        Utils.matToBitmap(dst,bmp);
+
+        Imgproc.threshold(dst, threshHolded, 10, 255, Imgproc.THRESH_BINARY);
+
+        Utils.matToBitmap(threshHolded, bmp);
+
+        Imgproc.medianBlur(threshHolded, blurred, 49);
+
+        Utils.matToBitmap(blurred, bmp);
+
+
+        //get color move coordinates
+        ArrayList<Point> squareArr = new ArrayList<>();
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                Rect reg = new Rect(j * 100, i * 100 , 100 , 100);
+                Mat square = new Mat(blurred, reg);
+                Utils.matToBitmap(square,bmp2);
+                if(Core.mean(square).val[0] > 7000){
+                    double val = Core.mean(square).val[0];
+                    squareArr.add(new Point(7-j, 7-i));
+                }
+                square.release();
+            }
+        }
+
+
+        result.release();
+        correctedmInitial.release();
+        kernel.release();
+        dst.release();
+        threshHolded.release();
+        blurred.release();
+
     }
 
-    private void WaitHandLeaveScreen() {
+    private void WaitHandLeaveScreen(Mat mGray) {
         System.out.printf("opencv: waiting for hand leave screen");
+        Imgproc.warpPerspective(mGray, correctedmGray, perspective, new Size(800, 800));
+        if (frameCount < 10) {
+            frameCount ++;
+            return;
+        }
+
+        //compute av difference with preFrames
+        // if av diff smaller some threshhold, the board has become stable again. i.e: no hands etc
+        double av = 0f;
+        for (Mat frame: prevFrames){
+            Mat result = new Mat();
+            Core.absdiff(correctedmGray, frame, result);
+            Scalar mean = Core.mean(result);
+            //String logresult = result.dump();
+            result.release();
+            av += mean.val[0];
+        }
+        av = av / prevFrames.size();
+        System.out.println("opencv wait for hand leave screen average: " + av);
+
+
+        if(prevFrames.size() < 5){
+            prevFrames.add(correctedmGray.clone());
+        }
+        else {
+            // If av < 1, board view is stable, ready for next move.
+            if (av < 1) {
+                System.out.println("opencv hand left the screen: " + av);
+                ProcessingMode = "GetMovePrediction";
+                for (Mat frame: prevFrames){
+                    frame.release();
+                }
+            }
+            else {
+                System.out.println("opencv hand still in the screen: " + av);
+                prevFrames.get(0).release();
+                prevFrames.remove(0);
+                prevFrames.add(correctedmGray.clone());
+            }
+        }
+        frameCount = 0;
     }
 
     private void WaitHandEnterScreen(Mat mGray) {
         System.out.println("opencv: waiting for hand enter screen");
         Imgproc.warpPerspective(mGray, correctedmGray, perspective, new Size(800, 800));
+        //for debugging
+        bmp = Bitmap.createBitmap(correctedmGray.cols(), correctedmGray.rows(), Bitmap.Config.ARGB_8888);
+        Utils.matToBitmap(correctedmGray,bmp);
+        //
         if(prevFrame.empty()){
             prevFrame = correctedmGray.clone();
         }
@@ -307,14 +411,14 @@ public class JavaCameraViewManager extends SimpleViewManager<FrameLayout>
             //String logresult = result.dump();
 
             //if diff too big => hand enter screen
-            if (mean.val[0] > 10){
+            if (mean.val[0] > 6){
                 System.out.println("opencv: Hand has enter screen");
                 ProcessingMode = "WaitHandLeaveScreen";
                 prevFrame.release();
                 correctedmGray.release();
             }
-            else{
-                System.out.println("opencv: Hand is not in screen, av: "+ mean.val[0]);
+            else {
+                System.out.println("opencv: hand is not on screen, diff: "+ mean.val[0]);
                 prevFrame = correctedmGray.clone();
                 correctedmGray.release();
             }
