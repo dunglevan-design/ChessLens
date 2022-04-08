@@ -70,6 +70,7 @@ public class JavaCameraViewManager extends SimpleViewManager<FrameLayout>
     private Mat outerCorner3;
     private Mat outerCorner4;
     private Mat InitialFrame;
+    private Mat InitialFrameRgba;
 
     private Integer frameCount;
 
@@ -82,6 +83,7 @@ public class JavaCameraViewManager extends SimpleViewManager<FrameLayout>
     Mat newm;
     Mat rsnewm;
     Bitmap bmp = null;
+
     @Override
     public String getName() {
         return REACT_CLASS;
@@ -185,10 +187,9 @@ public class JavaCameraViewManager extends SimpleViewManager<FrameLayout>
         switch (ProcessingMode) {
             case "CheckCorners":
                 System.out.println("opencv I am checking corners");
-                mIntermediateMat = findInnerCorner(mGray);
-                String log = mIntermediateMat.dump();
-                System.out.println("opencv outside intermediate mat" + log);
-                if (!mIntermediateMat.empty()) {
+                findInnerCorner(mGray);
+                if (mIntermediateMat != null && !mIntermediateMat.empty()) {
+                    String log = mIntermediateMat.dump();
                     perspective = Imgproc.getPerspectiveTransform(mIntermediateMat, newmcorners);
                     Imgproc.warpPerspective(mRgba, correctedmRgba, perspective, new Size(800, 800));
 //                    bmp = Bitmap.createBitmap(correctedmRgba.cols(), correctedmRgba.rows(), Bitmap.Config.ARGB_8888);
@@ -238,7 +239,7 @@ public class JavaCameraViewManager extends SimpleViewManager<FrameLayout>
                 break;
             case "SaveCorners":
                 System.out.println("Just saving corners");
-                mIntermediateMat = findInnerCorner(mGray);
+                findInnerCorner(mGray);
                 if (!mIntermediateMat.empty()) {
                     perspective = Imgproc.getPerspectiveTransform(mIntermediateMat, newmcorners);
                     ProcessingMode = "";
@@ -256,6 +257,7 @@ public class JavaCameraViewManager extends SimpleViewManager<FrameLayout>
             case "SaveInitialFrameAndPredictMyMove":
                 System.out.println("opencv Saving initial frame");
                 InitialFrame = mGray.clone();
+                InitialFrameRgba = mRgba.clone();
                 ProcessingMode = "PredictMyMove";
                 break;
 
@@ -300,28 +302,91 @@ public class JavaCameraViewManager extends SimpleViewManager<FrameLayout>
         System.out.println("Getting Move prediction");
         Mat correctedmInitial = new Mat();
         Mat result = new Mat();
+        Mat correctedDiff = new Mat();
         Mat dst = new Mat();
         Mat threshHolded = new Mat();
         Mat blurred = new Mat();
+        Mat adaptivethreshHolded = new Mat();
+        Mat OtsuthreshHolded = new Mat();
+
         Imgproc.warpPerspective(mGray, correctedmGray, perspective, new Size(800, 800));
         Imgproc.warpPerspective(InitialFrame, correctedmInitial, perspective, new Size(800, 800));
+        Imgproc.warpPerspective(InitialFrameRgba, correctedmRgba, perspective, new Size(800, 800));
 
-        Core.absdiff(correctedmGray, correctedmInitial, result);
-        Mat kernel = Mat.ones(5,5,CvType.CV_32F);
+        bmp = Bitmap.createBitmap(800, 800, Bitmap.Config.ARGB_8888);
+        Bitmap bmp3 = Bitmap.createBitmap(800, 800, Bitmap.Config.ARGB_8888);
+        Bitmap bmp4 = Bitmap.createBitmap(800, 800, Bitmap.Config.ARGB_8888);
+        Bitmap bmp2 = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
+
+        /**
+         * Create diff image. Apply closing operation
+         * */
+        Core.absdiff(mGray, InitialFrame, result);
+        Mat kernel = Mat.ones(10,10,CvType.CV_32F);
         Imgproc.morphologyEx(result, dst, Imgproc.MORPH_CLOSE, kernel);
         //Imgproc.morphologyEx(result, dst, Imgproc.MORPH_OPEN, kernel);
 
-        bmp = Bitmap.createBitmap(correctedmGray.cols(), correctedmGray.rows(), Bitmap.Config.ARGB_8888);
-        Bitmap bmp2 = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
-        Utils.matToBitmap(dst,bmp);
+        /**
+         * Correct perspective
+         * */
+        Imgproc.warpPerspective(dst, correctedDiff, perspective, new Size(800,800));
 
-        Imgproc.threshold(dst, threshHolded, 10, 255, Imgproc.THRESH_BINARY);
-
-        Utils.matToBitmap(threshHolded, bmp);
-
-        Imgproc.medianBlur(threshHolded, blurred, 49);
-
+        /**
+         * threshholded and median blurred
+         */
+        Imgproc.threshold(correctedDiff, threshHolded, 70, 255, Imgproc.THRESH_BINARY + Imgproc.THRESH_OTSU);
+        Imgproc.medianBlur(threshHolded, blurred, 5);
         Utils.matToBitmap(blurred, bmp);
+
+        /**
+         * Find contour
+         */
+        List<MatOfPoint> contours = new ArrayList<>();
+        Mat hierarchey = new Mat();
+        Imgproc.findContours(blurred, contours, hierarchey ,Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
+        Imgproc.drawContours(correctedmRgba, contours, -1, new Scalar(0, 0, 255), 2, Imgproc.LINE_8, hierarchey, 2, new Point());
+        Utils.matToBitmap(correctedmRgba, bmp3);
+
+
+        /**
+         * Find canny on original
+         */
+        List<MatOfPoint> contours2 = new ArrayList<>();
+        Mat hierarchy2 = new Mat();
+        Mat blurred2 = new Mat();
+        Mat cannyed = new Mat();
+        Imgproc.GaussianBlur(correctedmInitial, blurred2,new Size(7,7), 0 ,0);
+        Utils.matToBitmap(blurred2, bmp3);
+
+        Imgproc.Canny(blurred2, cannyed, 80, 100, 3);
+        Utils.matToBitmap(cannyed, bmp3);
+
+        /**
+         * Find contour on cannyed
+         */
+        Imgproc.findContours(cannyed, contours2, hierarchy2 ,Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE );
+        //Imgproc.drawContours(correctedmRgba, contours2, -1, new Scalar(0, 0, 0, 0), 3, Imgproc.LINE_8, hierarchy2, 2, new Point());
+        //Utils.matToBitmap(correctedmRgba, bmp4);
+
+
+        //Canny edge and contour con original. Then match shape.
+        /**
+         * Match shape contour
+         */
+        List<Double> rets = new ArrayList<>();
+        for (MatOfPoint c : contours2){
+            double ret = Imgproc.matchShapes(c, contours.get(0), 1, 0);
+            if (ret < 0.1){
+                rets.add(ret);
+                System.out.println("opencv ret:" + ret);
+                List<MatOfPoint> cs = new ArrayList<>();
+                cs.add(c);
+                //
+                Imgproc.drawContours(correctedmRgba, cs, -1, new Scalar(0, 0, 255, 255), 3, Imgproc.LINE_8, new Mat(), 2, new Point());
+                Utils.matToBitmap(correctedmRgba, bmp4);
+            }
+        }
+
 
 
         //get color move coordinates
@@ -333,26 +398,33 @@ public class JavaCameraViewManager extends SimpleViewManager<FrameLayout>
                 Utils.matToBitmap(square,bmp2);
                 if(Core.mean(square).val[0] > 7000){
                     double val = Core.mean(square).val[0];
-                    squareArr.add(new Point(7-j, 7-i));
+                    squareArr.add(new Point(j, i));
                 }
                 square.release();
             }
         }
+        // separate
+
+
+
 
 
         result.release();
+        correctedDiff.release();
         correctedmInitial.release();
         kernel.release();
         dst.release();
         threshHolded.release();
+        adaptivethreshHolded.release();
         blurred.release();
+        hierarchey.release();
 
     }
 
     private void WaitHandLeaveScreen(Mat mGray) {
         System.out.printf("opencv: waiting for hand leave screen");
         Imgproc.warpPerspective(mGray, correctedmGray, perspective, new Size(800, 800));
-        if (frameCount < 10) {
+        if (frameCount < 5) {
             frameCount ++;
             return;
         }
@@ -430,12 +502,12 @@ public class JavaCameraViewManager extends SimpleViewManager<FrameLayout>
         return cameraBridgeViewBase;
     }
 
-    public Mat findInnerCorner(Mat mat) {
+    public void findInnerCorner(Mat mat) {
         corners = new MatOfPoint2f();
         boolean found = Calib3d.findChessboardCorners(mat, new Size(7, 7), corners, Calib3d.CALIB_CB_ADAPTIVE_THRESH + Calib3d.CALIB_CB_NORMALIZE_IMAGE);
        // Calib3d.drawChessboardCorners(mat, new Size(7,7), corners, found);
 
-        if(!found) return corners;
+        if(!found) return;
 
         String log =  corners.dump();
         System.out.println("opencv corner Size: " );
@@ -464,7 +536,6 @@ public class JavaCameraViewManager extends SimpleViewManager<FrameLayout>
         System.out.println("opencv inside" + mIntermediateMat);
         corners.release();
 
-        return mIntermediateMat;
     }
 
 
