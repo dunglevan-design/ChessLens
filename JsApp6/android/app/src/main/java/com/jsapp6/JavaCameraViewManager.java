@@ -2,13 +2,20 @@ package com.jsapp6;
 
 import android.graphics.Bitmap;
 import android.os.Environment;
+import android.util.Pair;
 import android.view.SurfaceView;
 
+import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.common.MapBuilder;
 import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.ThemedReactContext;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.JavaCameraView;
 import org.opencv.android.Utils;
@@ -62,12 +69,14 @@ import org.opencv.calib3d.Calib3d;
 import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 public class JavaCameraViewManager extends SimpleViewManager<FrameLayout>
         implements CameraBridgeViewBase.CvCameraViewListener2 {
+    ReactContext context;
     public static final String REACT_CLASS = "JavaCameraView";
     public CameraBridgeViewBase cameraBridgeViewBase;
     public final int COMMAND_CHECK_CORNERS = 1;
@@ -99,6 +108,10 @@ public class JavaCameraViewManager extends SimpleViewManager<FrameLayout>
     Mat newm;
     Mat rsnewm;
     Bitmap bmp = null;
+
+    public JavaCameraViewManager(ReactContext context) {
+        this.context = context;
+    }
 
     @Override
     public String getName() {
@@ -291,6 +304,7 @@ public class JavaCameraViewManager extends SimpleViewManager<FrameLayout>
 
             case "GetMovePrediction":
                 GetMovePrediction(mGray);
+                ProcessingMode = "";
                 break;
             default:
                 System.out.println("opencv Currently not processing anything, on standby mode: " + ProcessingMode);
@@ -314,25 +328,16 @@ public class JavaCameraViewManager extends SimpleViewManager<FrameLayout>
         return rsnewm;
     }
 
-    private void GetMovePrediction(Mat mGray) {
+    private void GetMovePrediction(Mat mGray){
         System.out.println("Getting Move prediction");
-        Mat correctedmInitial = new Mat();
+        ArrayList<Pair<String,Float>> moves = new ArrayList<>();
         Mat result = new Mat();
         Mat correctedDiff = new Mat();
+        Mat correctedmInitial = new Mat();
         Mat dst = new Mat();
         Mat threshHolded = new Mat();
         Mat blurred = new Mat();
-        Mat adaptivethreshHolded = new Mat();
-        Mat OtsuthreshHolded = new Mat();
-
-        Imgproc.warpPerspective(mGray, correctedmGray, perspective, new Size(800, 800));
-        Imgproc.warpPerspective(InitialFrame, correctedmInitial, perspective, new Size(800, 800));
-        Imgproc.warpPerspective(InitialFrameRgba, correctedmRgba, perspective, new Size(800, 800));
-
         bmp = Bitmap.createBitmap(800, 800, Bitmap.Config.ARGB_8888);
-        Bitmap bmp2 = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
-        Bitmap bmp3 = Bitmap.createBitmap(800, 800, Bitmap.Config.ARGB_8888);
-        Bitmap bmp4 = Bitmap.createBitmap(800, 800, Bitmap.Config.ARGB_8888);
 
         /**
          * Create diff image. Apply closing operation
@@ -355,11 +360,10 @@ public class JavaCameraViewManager extends SimpleViewManager<FrameLayout>
         Utils.matToBitmap(blurred, bmp);
 
 
-
         //get color move coordinates
         ArrayList<Point> squareArr = new ArrayList<>();
-        ArrayList<Point> square1 = new ArrayList<>();
-        ArrayList<Point> square2 = new ArrayList<>();
+        ArrayList<Point> squares1 = new ArrayList<>();
+        ArrayList<Point> squares2 = new ArrayList<>();
         boolean found = false;
         int count = 0;
         for (int i = 0; i < 8; i++) {
@@ -367,55 +371,90 @@ public class JavaCameraViewManager extends SimpleViewManager<FrameLayout>
                 while(j < 8 && currentSquareContainsWhite(blurred,j,i)) {
                     found = true;
                     if (count == 0) {
-                        square1.add(new Point(j,i));
+                        squares1.add(new Point(j,i));
                     }
                     else {
-                        square2.add(new Point(j,i));
+                        squares2.add(new Point(j,i));
                     }
                     j++;
                 }
                 if (found) {
-                    count ++;
+                    count = 1;
                 }
             }
         }
-        // separate
-
-
 
 
         /**
-         * Template matching for fun
+         * Feature matching
          */
         Bitmap bmpresult = Bitmap.createBitmap(800, 800, Bitmap.Config.ARGB_8888);
+        Bitmap bmpgray = Bitmap.createBitmap(800, 800, Bitmap.Config.ARGB_8888);
+        Bitmap bmpInitial = Bitmap.createBitmap(800, 800, Bitmap.Config.ARGB_8888);
         Mat correctedResult = new Mat();
         Imgproc.warpPerspective(result, correctedResult, perspective, new Size(800, 800));
+        Imgproc.warpPerspective(mGray, correctedmGray, perspective, new Size(800, 800));
+        Imgproc.warpPerspective(InitialFrame, correctedmInitial, perspective, new Size(800, 800));
+
         Utils.matToBitmap(correctedResult, bmpresult);
-        Bitmap bmpgray = Bitmap.createBitmap(800, 800, Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(correctedmGray, bmpgray);
+        Utils.matToBitmap(correctedmInitial, bmpInitial);
 
-        Rect reg = new Rect((int)square2.get(0).x * 100, (int)square2.get(0).y * 100 , 100 , 100);
-        Mat template = new Mat(correctedResult, reg);
-        Rect reg2 = new Rect((int)square1.get(0).x * 100, (int)square1.get(0).y * 100 , 100 , 100);
-        Mat obj = new Mat(correctedmGray, reg2);
-        DetectFeatures(template, obj);
+        int reg1Len = squares1.size();
+        int reg2Len = squares2.size();
 
-//        Utils.matToBitmap(template, bmp2);
-//        Mat templatedresult = new Mat();
-//        Imgproc.matchTemplate(correctedmGray, template, templatedresult, Imgproc.TM_CCOEFF);
-//        //Core.normalize(templatedresult, templatedresult, 0, 1, Core.NORM_MINMAX, -1, new Mat());
-//        Point matchLoc;
-//        Core.MinMaxLocResult mmr = Core.minMaxLoc(templatedresult);
-//        matchLoc = mmr.maxLoc;
-//        double score= mmr.maxVal;
-//        Imgproc.rectangle(correctedmRgba, matchLoc, new Point(matchLoc.x + template.cols(), matchLoc.y + template.rows()),
-//                new Scalar(0, 0, 0), 2, 8, 0);
-//        Utils.matToBitmap(correctedmRgba, bmp4);
+        if (reg2Len > 0) {
+            Rect reg1 = new Rect((int) squares1.get(0).x * 100, (int) squares1.get(0).y * 100, 100 * reg1Len, 100);
+            Rect reg2 = new Rect((int) squares2.get(0).x * 100, (int) squares2.get(0).y * 100, 100 * reg2Len, 100);
+
+            Mat template1 = new Mat(correctedResult, reg1);
+            Mat template2 = new Mat(correctedResult, reg2);
+            Mat afterMove1 = new Mat(correctedmGray, reg1);
+            Mat afterMove2 = new Mat(correctedmGray, reg2);
+            Mat beforeMove1 = new Mat(correctedmInitial, reg1);
+            Mat beforeMove2 = new Mat(correctedmInitial, reg2);
+            Point From;
+            Point To;
+            String move;
+            Float Reg1IsAfterMove = DetectFeatures(template1, afterMove1) - 0.3f * DetectFeatures(template2, afterMove2);
+            Float Reg1IsBeforeMove = DetectFeatures(template1, beforeMove1) - 0.3f * DetectFeatures(template2, beforeMove2);
+            if (Reg1IsAfterMove > Reg1IsBeforeMove) {
+                To = squares1.get(reg1Len-1);
+                From = squares2.get(reg2Len-1);
+                move = ComputeChessCoordinate(From, To);
+                moves.add(new Pair<>(move, Reg1IsAfterMove));
+            }
+            else {
+                To = squares2.get(reg2Len-1);
+                From = squares1.get(reg1Len-1);
+                move = ComputeChessCoordinate(From, To);
+                moves.add(new Pair<>(move, Reg1IsBeforeMove));
+            }
+            template1.release();
+            template2.release();
+            afterMove1.release();
+            afterMove2.release();
+            beforeMove1.release();
+            beforeMove2.release();
+        }
 
         /**
-         * Lets fuking try features matching
+         * When the 2 regions connected.
          */
+        else {
+            Point From;
+            Point To;
+            String move;
+            System.out.println("2 regions connected");
+            From = squares1.get(reg1Len - 1);
+            To = squares1.get(reg1Len - 2);
+            move = ComputeChessCoordinate(From, To);
+            move = ComputeChessCoordinate(To, From);
+            moves.add(new Pair<>(move, 1f));
+            moves.add(new Pair<>(move, 1f));
+        }
 
+        Playmove(moves);
 
         result.release();
         correctedDiff.release();
@@ -423,34 +462,73 @@ public class JavaCameraViewManager extends SimpleViewManager<FrameLayout>
         kernel.release();
         dst.release();
         threshHolded.release();
-        adaptivethreshHolded.release();
         blurred.release();
 
     }
 
-    private void DetectFeatures(Mat uncannyedtemplate, Mat uncannyedobj) {
-        Bitmap bmpgray = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
-        Bitmap bmptemplate = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
-        Mat obj = new Mat();
-        Mat template = new Mat();
-        Imgproc.Canny(uncannyedobj, obj, 80, 100, 3);
-        Imgproc.Canny(uncannyedtemplate, template, 80, 100, 3);
-        Utils.matToBitmap(obj, bmpgray);
-        Utils.matToBitmap(template, bmptemplate);
+    private void Playmove(ArrayList<Pair<String, Float>> moves) {
+        WritableMap params = Arguments.createMap();
+        JSONArray ja = new JSONArray();
+        Integer index = 0;
+        for (Pair<String,Float> pair: moves) {
+            JSONObject jo = new JSONObject();
+            try {
+                jo.put("move", pair.first);
+                jo.put("prob", pair.second);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            ja.put(jo);
+        }
+        params.putString("moves", ja.toString());
+        JavaCameraControlModule.sendEvent(context, "MovePredictionFound", params);
+    }
+
+
+    private String ComputeChessCoordinate(Point from, Point to) {
+        HashMap<Integer, String> Files = new HashMap<>();
+        Files.put(1,"a");
+        Files.put(2,"b");
+        Files.put(3,"c");
+        Files.put(4,"d");
+        Files.put(5,"e");
+        Files.put(6,"f");
+        Files.put(7,"g");
+        Files.put(8,"h");
+        int rankFrom = (int) (from.y + 1);
+        int rankTo = (int) (to.y + 1);
+
+        int fileTo = (int) (7 - to.x + 1);
+        int fileFrom = (int) (7 - from.x + 1);
+        String fileStrFrom = Files.get(fileFrom);
+        String fileStrTo = Files.get(fileTo);
+        return fileStrFrom + rankFrom + "to" + fileStrTo + rankTo;
+    }
+
+    private Float DetectFeatures(Mat template, Mat obj) {
+        Float certainty;
+        Bitmap bmpgray = Bitmap.createBitmap(obj.width(), obj.height(), Bitmap.Config.ARGB_8888);
+        Bitmap bmptemplate = Bitmap.createBitmap(template.width(), template.height(), Bitmap.Config.ARGB_8888);
+        Mat cannyedobj = new Mat();
+        Mat cannyedtemplate = new Mat();
+        Imgproc.Canny(obj, cannyedobj, 80, 100, 3);
+        Imgproc.Canny(template, cannyedtemplate, 80, 100, 3);
+        Utils.matToBitmap(cannyedobj, bmpgray);
+        Utils.matToBitmap(cannyedtemplate, bmptemplate);
         DescriptorMatcher matcher = DescriptorMatcher.create(DescriptorMatcher.BRUTEFORCE_HAMMING);
 
-        //gray
+        //OBJ
         ORB featureDetector = ORB.create();
         MatOfKeyPoint objectKeyPoints = new MatOfKeyPoint();
         Mat descriptors = new Mat();
-        featureDetector.detect(obj, objectKeyPoints);
-        featureDetector.compute(obj, objectKeyPoints, descriptors);
+        featureDetector.detect(cannyedobj, objectKeyPoints);
+        featureDetector.compute(cannyedobj, objectKeyPoints, descriptors);
 
         //template
         MatOfKeyPoint templateKeyPoints = new MatOfKeyPoint();
         Mat templatedescriptors = new Mat();
-        featureDetector.detect(template, templateKeyPoints);
-        featureDetector.compute(template, templateKeyPoints, templatedescriptors);
+        featureDetector.detect(cannyedtemplate, templateKeyPoints);
+        featureDetector.compute(cannyedtemplate, templateKeyPoints, templatedescriptors);
 
         // Matching
         List<MatOfDMatch> matches = new LinkedList<MatOfDMatch>();
@@ -473,44 +551,41 @@ public class JavaCameraViewManager extends SimpleViewManager<FrameLayout>
             }
         }
         Mat outImg = new Mat();
-        Bitmap bmpoutImg;
-        if (goodMatchesList.size() >= 0) {
+        if (goodMatchesList.size() >= 10) {
             String rs = "object found";
-            MatOfDMatch goodMatches = new MatOfDMatch();
-            goodMatches.fromList(goodMatchesList);
-            Features2d.drawMatches(obj, objectKeyPoints, template, templateKeyPoints, goodMatches, outImg, RED, GREEN, new MatOfByte(), Features2d.NOT_DRAW_SINGLE_POINTS);
-            bmpoutImg = Bitmap.createBitmap(outImg.width(), outImg.height(), Bitmap.Config.ARGB_8888);
-            if(outImg.empty()) {
-                Log.d("opencv", "empty features matching img");
-            }
-            Utils.matToBitmap(outImg, bmpoutImg);
+//            MatOfDMatch goodMatches = new MatOfDMatch();
+//            goodMatches.fromList(goodMatchesList);
+//            Features2d.drawMatches(obj, objectKeyPoints, template, templateKeyPoints, goodMatches, outImg, RED, GREEN, new MatOfByte(), Features2d.NOT_DRAW_SINGLE_POINTS);
+//            File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+//            String filename = "featuresdetected.png";
+//            File file = new File(path, filename);
+//
+//            Boolean bool = null;
+//            filename = file.toString();
+//            bool = Imgcodecs.imwrite(filename, outImg);
+//
+//            if (bool == true) {
+//
+//                Log.d("opencv", "SUCCESS writing image to external storage");
+//            }
+//            else{
+//                Log.d("opencv", "Fail writing image to external storage");
+//            }
 
-            File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-            String filename = "featuresdetected.png";
-            File file = new File(path, filename);
-
-            Boolean bool = null;
-            filename = file.toString();
-            bool = Imgcodecs.imwrite(filename, outImg);
-
-            if (bool == true) {
-
-                Log.d("opencv", "SUCCESS writing image to external storage");
-            }
-            else{
-                Log.d("opencv", "Fail writing image to external storage");
-            }
+            certainty = goodMatchesList.size() / 15f;
         }
+        certainty = goodMatchesList.size() / 15f;
         System.out.println("done");
+        return certainty;
     }
 
     private boolean currentSquareContainsWhite(Mat blurred, int j, int i) {
+        Bitmap bmpsquare = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
         Rect reg = new Rect(j * 100, i * 100 , 100 , 100);
         Mat square = new Mat(blurred, reg);
         double[] val = Core.mean(square).val;
-        Bitmap bmpresult = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
-        Utils.matToBitmap(square, bmpresult);
-        if (Core.mean(square).val[0]/255 > 0.2) {
+        Utils.matToBitmap(square, bmpsquare);
+        if (Core.mean(square).val[0]/255 > 0.3) {
             square.release();
             return true;
         }

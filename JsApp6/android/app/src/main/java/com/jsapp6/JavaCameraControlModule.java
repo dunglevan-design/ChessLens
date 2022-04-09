@@ -35,7 +35,7 @@ public class JavaCameraControlModule extends ReactContextBaseJavaModule {
         }
     }
 
-    private void sendEvent(ReactContext reactContext,
+    public static void sendEvent(ReactContext reactContext,
                            String eventName,
                            @Nullable WritableMap params) {
         reactContext

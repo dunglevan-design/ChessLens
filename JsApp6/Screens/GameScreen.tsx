@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, NativeEventEmitter } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import {
   JavaCameraControlModule,
@@ -24,6 +24,30 @@ const GameScreen = ({ route, navigation }) => {
   const [stage, setStage] = useState(0);
   let setupMessage = "";
   const ref = useRef(null);
+  let eventListener;
+
+  useEffect(() => {
+    const eventEmitter = new NativeEventEmitter(JavaCameraControlModule);
+    eventListener = eventEmitter.addListener('MovePredictionFound', (e) => MovePredictionFoundHandler(e));
+  },[])
+
+  const MovePredictionFoundHandler = (e) => {
+    const data = e.moves;
+    const movearr = JSON.parse(data);
+    const move = movearr[0].move;
+    const prob = movearr[0].prob;
+    console.log("move: " , move, ", prob: ", prob);
+    /**
+     * Try play all the moves.
+     * If move fail then set ProcessingMode to PredictMymove or Wait hand enter screen again.
+     */
+
+    /**
+     * If move success. 
+     * SaveInitialFrame
+     * On Opponentmove -> Play the move.
+     */
+  }
 
   //Update UI every render base on stage
   switch (stage) {

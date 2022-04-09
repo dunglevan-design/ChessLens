@@ -15,7 +15,7 @@ public class JavaCameraViewPackage implements ReactPackage {
     @Override
     public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
         if (javaCameraViewManager == null){
-            javaCameraViewManager = new JavaCameraViewManager();
+            javaCameraViewManager = new JavaCameraViewManager(reactContext);
         }
         return Arrays.<NativeModule>asList(
                 new JavaCameraControlModule(reactContext, javaCameraViewManager));
@@ -23,7 +23,7 @@ public class JavaCameraViewPackage implements ReactPackage {
     @Override
     public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
         if (javaCameraViewManager == null) {
-            javaCameraViewManager = new JavaCameraViewManager();
+            javaCameraViewManager = new JavaCameraViewManager(reactContext);
         }
         return Collections.<ViewManager>singletonList(
                 javaCameraViewManager
