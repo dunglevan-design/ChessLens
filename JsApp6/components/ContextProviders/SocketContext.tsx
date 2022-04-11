@@ -44,7 +44,7 @@ const SocketContext = ({ children }) => {
 
   // List of consumer funtions on message
 
-  const startGame = (config: config) => {
+  const startGame = (config) => {
     setMessage({
       action: "StartGame",
       data: config,
@@ -70,9 +70,21 @@ const SocketContext = ({ children }) => {
       // TODO: do different thing depends on message type. i.e: set different state to populate the tree
       switch (action.type) {
         case "gameStart":
-          const config: config = action.data;
+          const config = action.data;
           startGame(config);
           break;
+
+        case "move": {
+          const move = action.data.move
+          console.log("received move ooponet", move)
+          setMessage({
+            action: "opponentMove",
+            data: move
+          })
+          break;
+        }
+
+        default:
       }
     };
 

@@ -1,4 +1,5 @@
 import asyncio
+from operator import truediv
 import string
 from threading import Thread
 import websockets
@@ -6,6 +7,9 @@ import json
 import berserk
 from requests_oauthlib import OAuth2Session
 import os
+
+from Game import Game
+from models import game
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 
@@ -16,6 +20,15 @@ async def consumer(action, websocket, client : berserk.clients.Client , board : 
         data = action["data"]
         challenge_data =client.challenges.create(data["username"], rated=False, color=berserk.enums.Color.WHITE, variant= berserk.enums.Variant.STANDARD)
         print(challenge_data)
+
+    elif type == "move":
+        print(action)
+        data = action["data"]
+        move = data["move"]
+        gameid = data["game"]
+        board.make_move(gameid, move)
+        
+
     elif type == "test":
         print("action: ", action)
 
@@ -38,15 +51,19 @@ async def producer(websocket, client:berserk.clients.Client, board:berserk.clien
         print(event)
         if event["type"] == "gameStart":
             print("opponent accepted the challenge")
+            isWhite = True
             action = {
                 "type": "gameStart",
                 "data": {
                     "color": "white",
                     "isWhite": True,
-                    "time" : ""
+                    "time" : "",
+                    "gameid": event["game"]["id"]
                 }
             }
             await websocket.send(json.dumps(action))
+            game = Game(board, event['game']['id'], isWhite, websocket )
+            game.start()
 
         
 

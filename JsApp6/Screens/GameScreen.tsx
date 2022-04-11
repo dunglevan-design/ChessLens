@@ -7,6 +7,11 @@ import {
 import { useAuth } from "../components/ContextProviders/AuthContext";
 import { useSocket } from "../components/ContextProviders/SocketContext";
 import { config } from "../components/utils/types";
+import { Chess } from "chess.js";
+
+import Tts from 'react-native-tts';
+
+Tts.setDefaultLanguage('en-GB')
 
 const STAGE = {
   CHECK_CORNERS: 0,
@@ -20,34 +25,72 @@ const STAGE = {
 const GameScreen = ({ route, navigation }) => {
   const { user } = useAuth();
   const { message, sendMessage } = useSocket();
-  const { config }: { config: config } = route.params;
+  const { config } = route.params;
   const [stage, setStage] = useState(0);
+  const [movehistory, setMoveHistory] = useState([]);
   let setupMessage = "";
   const ref = useRef(null);
+  const chessRef = useRef(new Chess());
+  const gameId = useRef(0);
+
   let eventListener;
 
   useEffect(() => {
     const eventEmitter = new NativeEventEmitter(JavaCameraControlModule);
-    eventListener = eventEmitter.addListener('MovePredictionFound', (e) => MovePredictionFoundHandler(e));
-  },[])
+    eventListener = eventEmitter.addListener("MovePredictionFound", (e) =>
+      MovePredictionFoundHandler(e)
+    );
+
+    return () => eventListener.remove();
+  }, []);
 
   const MovePredictionFoundHandler = (e) => {
+    const chess = chessRef.current;
     const data = e.moves;
     const movearr = JSON.parse(data);
-    const move = movearr[0].move;
-    const prob = movearr[0].prob;
-    console.log("move: " , move, ", prob: ", prob);
+    const bestmove = movearr[0].move;
+    const bestprob = movearr[0].prob;
+    console.log("move: ", bestmove, ", prob: ", bestprob);
     /**
-     * Try play all the moves.
-     * If move fail then set ProcessingMode to PredictMymove or Wait hand enter screen again.
+     * Try play all the moves on Chessjs
+     * If all move fail then set ProcessingMode to PredictMymove or Wait hand enter screen again.
      */
+    let i = 0;
+    let movePlayed = false;
+    while (i < movearr.length && !movePlayed) {
+      const movestr = movearr[i].move;
+      const from = movestr.substr(0, 2);
+      const to = movestr.substr(4, 5);
+
+      console.log("from :", from);
+      console.log("to : ", to);
+      const moveobj = chess.move({ from: from, to: to });
+      // If move sucess play on lichess.
+      if (moveobj) {
+        const action = {
+          type: "move",
+          data: {
+            move: from.concat(to),
+            game: gameId.current,
+          },
+        };
+        sendMessage(action);
+        movePlayed = true;
+        setMoveHistory(chess.history({ verbose: false }));
+      }
+      console.log(chess.history({ verbose: false }));
+      i = i + 1;
+    }
 
     /**
-     * If move success. 
+     * If move success.
+     * Play move on Lichess
      * SaveInitialFrame
-     * On Opponentmove -> Play the move.
+     * On Opponentmove:
+     * update chessjs state
+     * processingMode = waithandenterScreen(opponent) -> waithandleavescreen(Opponent) -> saveCurrentFrameToInitialFrame.
      */
-  }
+  };
 
   //Update UI every render base on stage
   switch (stage) {
@@ -97,12 +140,12 @@ const GameScreen = ({ route, navigation }) => {
         case STAGE.GAME_STARTED:
           SaveInitialFrameAndPredictMyMove();
           break;
-        case STAGE.WAITING_FOR_MY_MOVE:
-          PredictMyMove();
-          break;
-        case STAGE.WAITING_FOR_OPPONENT_MOVE:
-          PredictOpponentMove();
-          break;
+        // case STAGE.WAITING_FOR_MY_MOVE:
+        //   PredictMyMove();
+        //   break;
+        // case STAGE.WAITING_FOR_OPPONENT_MOVE:
+        //   PredictOpponentMove();
+        //   break;
         default:
           console.log("nothnig");
       }
@@ -114,7 +157,19 @@ const GameScreen = ({ route, navigation }) => {
     switch (message?.action) {
       case "StartGame":
         console.log("StartGame");
+        chessRef.current = new Chess();
+        gameId.current = message.data.gameid;
         setStage(STAGE.GAME_STARTED);
+        break;
+      case "opponentMove":
+        console.log("Playing opponent move");
+        const moveobj = chessRef.current.move(message.data, {sloppy: true});
+        if (moveobj) {
+          console.log("update opponent move sucess");
+          Tts.speak(moveobj.from + "to" + moveobj.to);
+          setMoveHistory(chessRef.current.history({ verbose: false }));
+          SaveInitialFrameAndPredictMyMove();
+        }
         break;
       default:
     }
@@ -139,17 +194,17 @@ const GameScreen = ({ route, navigation }) => {
   };
 
   const SaveInitialFrameAndPredictMyMove = () => {
-    console.log("save initial frame getting called?")
+    console.log("save initial frame getting called?");
     JavaCameraControlModule.PassCommand("SaveInitialFrameAndPredictMyMove");
   };
 
-  const PredictMyMove = () => {
-    JavaCameraControlModule.PassCommand("PredictMyMove");
-  };
+  // const PredictMyMove = () => {
+  //   JavaCameraControlModule.PassCommand("PredictMyMove");
+  // };
 
-  const PredictOpponentMove = () => {
-    JavaCameraControlModule.PassCommand("PredictOpponentMove");
-  };
+  // const PredictOpponentMove = () => {
+  //   JavaCameraControlModule.PassCommand("PredictOpponentMove");
+  // };
 
   return (
     <View style={{ flex: 1 }}>
@@ -190,6 +245,10 @@ const GameScreen = ({ route, navigation }) => {
             </TouchableOpacity>
           </View>
         )}
+        <Text style = {{fontSize: 24, fontWeight: "700"}}>Moves</Text>
+        <Text style = {{fontSize: 20}}>
+          {movehistory}
+        </Text>
       </View>
     </View>
   );

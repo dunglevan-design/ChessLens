@@ -53,6 +53,7 @@ import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.features2d.BFMatcher;
+import org.opencv.features2d.BOWTrainer;
 import org.opencv.features2d.DescriptorMatcher;
 import org.opencv.features2d.Feature2D;
 import org.opencv.features2d.Features2d;
@@ -78,6 +79,8 @@ public class JavaCameraViewManager extends SimpleViewManager<FrameLayout>
         implements CameraBridgeViewBase.CvCameraViewListener2 {
     ReactContext context;
     public static final String REACT_CLASS = "JavaCameraView";
+    private final int ME = 0;
+    private final int OPPONENT = 1;
     public CameraBridgeViewBase cameraBridgeViewBase;
     public final int COMMAND_CHECK_CORNERS = 1;
     private Mat mRgba;
@@ -96,6 +99,7 @@ public class JavaCameraViewManager extends SimpleViewManager<FrameLayout>
     private Mat outerCorner4;
     private Mat InitialFrame;
     private Mat InitialFrameRgba;
+    private int turn = ME;
 
     private Integer frameCount;
 
@@ -278,11 +282,6 @@ public class JavaCameraViewManager extends SimpleViewManager<FrameLayout>
                 }
                 break;
 
-//            case "SaveInitialFrame":
-//                System.out.println("opencv Saving initial frame");
-//                InitialFrame = mGray.clone();
-//                ProcessingMode = "";
-//                break;
             case "SaveInitialFrameAndPredictMyMove":
                 System.out.println("opencv Saving initial frame");
                 InitialFrame = mGray.clone();
@@ -291,10 +290,19 @@ public class JavaCameraViewManager extends SimpleViewManager<FrameLayout>
                 break;
 
             case "PredictMyMove":
+                if (InitialFrame == null) {
+                    InitialFrame = mGray.clone();
+                }
                 ProcessingMode = "WaitHandEnterScreen";
                 break;
 
             case "WaitHandEnterScreen":
+                if(!prevFrames.isEmpty()) {
+                    for (int i = 0; i < prevFrames.size(); i++) {
+                        prevFrames.get(i).release();
+                        prevFrames.remove(i);
+                    }
+                }
                 WaitHandEnterScreen(mGray);
                 break;
 
@@ -449,8 +457,8 @@ public class JavaCameraViewManager extends SimpleViewManager<FrameLayout>
             From = squares1.get(reg1Len - 1);
             To = squares1.get(reg1Len - 2);
             move = ComputeChessCoordinate(From, To);
-            move = ComputeChessCoordinate(To, From);
             moves.add(new Pair<>(move, 1f));
+            move = ComputeChessCoordinate(To, From);
             moves.add(new Pair<>(move, 1f));
         }
 
@@ -585,7 +593,7 @@ public class JavaCameraViewManager extends SimpleViewManager<FrameLayout>
         Mat square = new Mat(blurred, reg);
         double[] val = Core.mean(square).val;
         Utils.matToBitmap(square, bmpsquare);
-        if (Core.mean(square).val[0]/255 > 0.3) {
+        if (Core.mean(square).val[0]/255 > 0.15) {
             square.release();
             return true;
         }
@@ -623,7 +631,14 @@ public class JavaCameraViewManager extends SimpleViewManager<FrameLayout>
             // If av < 1, board view is stable, ready for next move.
             if (av < 1) {
                 System.out.println("opencv hand left the screen: " + av);
-                ProcessingMode = "GetMovePrediction";
+                if(turn == ME) {
+                    ProcessingMode = "GetMovePrediction";
+                    turn = OPPONENT;
+                }
+                else {
+                    ProcessingMode = "SaveInitialFrameAndPredictMyMove";
+                    turn = ME;
+                }
                 for (Mat frame: prevFrames){
                     frame.release();
                 }
@@ -640,22 +655,40 @@ public class JavaCameraViewManager extends SimpleViewManager<FrameLayout>
 
     private void WaitHandEnterScreen(Mat mGray) {
         System.out.println("opencv: waiting for hand enter screen");
-        Imgproc.warpPerspective(mGray, correctedmGray, perspective, new Size(800, 800));
         //for debugging
-        bmp = Bitmap.createBitmap(correctedmGray.cols(), correctedmGray.rows(), Bitmap.Config.ARGB_8888);
-        Utils.matToBitmap(correctedmGray,bmp);
-        //
-        if(prevFrame.empty()){
-            prevFrame = correctedmGray.clone();
-        }
-        else{
+        bmp = Bitmap.createBitmap(mGray.width(), mGray.height(), Bitmap.Config.ARGB_8888);
+        Bitmap bmpResult = Bitmap.createBitmap(mGray.width(), mGray.height(), Bitmap.Config.ARGB_8888);
+        Bitmap bmpCorrectedResult = Bitmap.createBitmap(800, 800, Bitmap.Config.ARGB_8888);
+        Bitmap bmpdst = Bitmap.createBitmap(800, 800, Bitmap.Config.ARGB_8888);
+        Bitmap bmpBlurred = Bitmap.createBitmap(800, 800, Bitmap.Config.ARGB_8888);
+        Bitmap bmpThreshHolded = Bitmap.createBitmap(800, 800, Bitmap.Config.ARGB_8888);
+//        //
+//        if(prevFrame.empty()){
+//            prevFrame = mGray.clone();
+//        }
+            Mat dst = new Mat();
+            Mat correctedResult = new Mat();
             Mat result = new Mat();
-            Core.absdiff(correctedmGray, prevFrame, result);
-            Scalar mean = Core.mean(result);
+            Mat threshHolded = new Mat();
+            Mat blurred = new Mat();
+            Core.absdiff(mGray, InitialFrame, result);
+            Imgproc.warpPerspective(result, correctedResult, perspective, new Size(800, 800));
+            Mat kernel = Mat.ones(10,10,CvType.CV_32F);
+            Imgproc.morphologyEx(correctedResult, dst, Imgproc.MORPH_CLOSE, kernel);
+            Imgproc.threshold(dst, threshHolded, 70, 255, Imgproc.THRESH_BINARY);
+            Imgproc.medianBlur(threshHolded, blurred, 5);
+
+            Utils.matToBitmap(result, bmpResult);
+            Utils.matToBitmap(correctedResult, bmpCorrectedResult);
+            Utils.matToBitmap(dst, bmpdst);
+            Utils.matToBitmap(threshHolded, bmpThreshHolded);
+            Utils.matToBitmap(blurred, bmpBlurred);
+
+            Scalar mean = Core.mean(blurred);
             //String logresult = result.dump();
 
             //if diff too big => hand enter screen
-            if (mean.val[0] > 6){
+            if (mean.val[0] > 5){
                 System.out.println("opencv: Hand has enter screen");
                 ProcessingMode = "WaitHandLeaveScreen";
                 prevFrame.release();
@@ -666,7 +699,6 @@ public class JavaCameraViewManager extends SimpleViewManager<FrameLayout>
                 prevFrame = correctedmGray.clone();
                 correctedmGray.release();
             }
-        }
 
     }
 
