@@ -1,5 +1,10 @@
 # ChessLens
 Over the board chess but online with computer vision
+
+![login](./public/loginscreen.png)
+![setup](./public/setup.png)
+![login](./public/playscreen.png)
+
 ## Goals
 The goal of this project is not to invent a new algorithm/model to detect chess pieces and board positions But rather to leverage,combine and improve on the existing algorithms and APIs to create
 an end-user application
