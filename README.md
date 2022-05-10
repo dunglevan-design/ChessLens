@@ -1,9 +1,12 @@
 # ChessLens
 Over the board chess but online with computer vision
 
-<img src="./public/loginscreen.png" width="128"/>
+<p align= "center">
+  <img src="./public/loginscreen.png" width="128"/>
 <img src="./public/playscreen.png" width="128"/>
 <img src="./public/setup.jpg" width="128"/>
+</p>
+
 
 ## Goals
 The goal of this project is not to invent a new algorithm/model to detect chess pieces and board positions But rather to leverage,combine and improve on the existing algorithms and APIs to create
