@@ -2,11 +2,11 @@
 Over the board chess but online with computer vision
 
 <p align= "center">
-  <img src="./public/loginscreen.png" width="512"/>
-<img src="./public/playscreen.png" width="512"/>
+  <img src="./public/loginscreen.png" width="256"/>
+<img src="./public/playscreen.png" width="256"/>
 </p>
 <p align = "center">
-  <img src="./public/setup.jpg" width="512"/>
+  <img src="./public/setup.jpg" width="256"/>
 </p>
 
 
