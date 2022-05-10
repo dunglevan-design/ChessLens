@@ -2,7 +2,7 @@
 Over the board chess but online with computer vision
 
 ![login](./public/loginscreen.png)
-![setup](./public/setup.png)
+![setup](./public/setup.jpg)
 ![login](./public/playscreen.png)
 
 ## Goals
