@@ -29,12 +29,12 @@ const LoginScreen = () => {
     console.log(await Linking.openURL(linkurl));
   };
   return (
-    <View style={{ flex: 1, padding: 10 }}>
-      <View style={{ position: "absolute", width: "100%", bottom: 0 }}>
+    <View style={{ flex: 1, padding: 10, backgroundColor: "#f8f8f8" }}>
+      <View style={{ position: "absolute", width: "100%", bottom: -150 }}>
         <Image
-          style={{ resizeMode: "contain", opacity: 0.6 }}
+          style={{ resizeMode: "contain", opacity: 0.9 }}
           resizeMode="contain"
-          source={require("../public/visioncamera.png")}
+          source={require("../public/logo.jpg")}
         ></Image>
       </View>
 

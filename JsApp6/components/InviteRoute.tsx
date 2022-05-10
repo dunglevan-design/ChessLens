@@ -36,12 +36,12 @@ const InviteRoute = () => {
   };
 
   return (
-    <View style={{ flex: 1 }}>
-      <View style={{ position: "absolute", width: "100%", bottom: 0 }}>
+    <View style={{ flex: 1, backgroundColor: "#f8f8f8" }}>
+      <View style={{ position: "absolute", width: "100%", bottom: -250, backgroundColor: "#f8f8f8" }}>
         <Image
-          style={{ resizeMode: "contain", opacity: 0.6 }}
+          style={{ resizeMode: "contain", opacity: 0.9 }}
           resizeMode="contain"
-          source={require("../public/visioncamera.png")}
+          source={require("../public/logo.jpg")}
         ></Image>
       </View>
       <Text

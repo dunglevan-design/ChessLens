@@ -220,13 +220,15 @@ public class JavaCameraViewManager extends SimpleViewManager<FrameLayout>
         switch (ProcessingMode) {
             case "CheckCorners":
                 System.out.println("opencv I am checking corners");
-                findInnerCorner(mGray);
+                findInnerCorner(mRgba);
                 if (mIntermediateMat != null && !mIntermediateMat.empty()) {
                     String log = mIntermediateMat.dump();
                     perspective = Imgproc.getPerspectiveTransform(mIntermediateMat, newmcorners);
                     Imgproc.warpPerspective(mRgba, correctedmRgba, perspective, new Size(800, 800));
-//                    bmp = Bitmap.createBitmap(correctedmRgba.cols(), correctedmRgba.rows(), Bitmap.Config.ARGB_8888);
-//                    Utils.matToBitmap(correctedmRgba,bmp);
+
+                    bmp = Bitmap.createBitmap(correctedmRgba.cols(), correctedmRgba.rows(), Bitmap.Config.ARGB_8888);
+                    Utils.matToBitmap(correctedmRgba,bmp);
+
                     hemo = new Mat();
                     Core.gemm(perspective.inv().t(), outerCorners, 1,new Mat(), 0 , hemo, 1 );
                     outerCorner1 = hemo.col(0).mul(new Mat(3,1, CvType.CV_64FC1,
@@ -258,6 +260,9 @@ public class JavaCameraViewManager extends SimpleViewManager<FrameLayout>
                             new Scalar(255,0,0), 3);
                     Imgproc.line(mRgba, point3, point1,
                             new Scalar(255,0,0), 3);
+
+                    Bitmap debug = Bitmap.createBitmap(mRgba.cols(), mRgba.rows(), Bitmap.Config.ARGB_8888);
+                    Utils.matToBitmap(mRgba,debug);
 
                     perspective.release();
                     outerCorner1.release();
@@ -347,10 +352,16 @@ public class JavaCameraViewManager extends SimpleViewManager<FrameLayout>
         Mat blurred = new Mat();
         bmp = Bitmap.createBitmap(800, 800, Bitmap.Config.ARGB_8888);
 
+        Bitmap debug2 = Bitmap.createBitmap(mRgba.width(), mRgba.height(), Bitmap.Config.ARGB_8888);
+        Utils.matToBitmap(mRgba, debug2);
+
+        Bitmap debug3 = Bitmap.createBitmap(mRgba.width(), mRgba.height(), Bitmap.Config.ARGB_8888);
+        Utils.matToBitmap(InitialFrameRgba, debug3);
         /**
          * Create diff image. Apply closing operation
          * */
         Core.absdiff(mGray, InitialFrame, result);
+
         Mat kernel = Mat.ones(10,10,CvType.CV_32F);
         Imgproc.morphologyEx(result, dst, Imgproc.MORPH_CLOSE, kernel);
         //Imgproc.morphologyEx(result, dst, Imgproc.MORPH_OPEN, kernel);
@@ -359,6 +370,11 @@ public class JavaCameraViewManager extends SimpleViewManager<FrameLayout>
          * Correct perspective
          * */
         Imgproc.warpPerspective(dst, correctedDiff, perspective, new Size(800,800));
+        Bitmap debug1 = Bitmap.createBitmap(dst.width(), dst.height(), Bitmap.Config.ARGB_8888);
+        Utils.matToBitmap(dst, debug1);
+
+        Bitmap debug5 = Bitmap.createBitmap(correctedDiff.width(), correctedDiff.height(), Bitmap.Config.ARGB_8888);
+        Utils.matToBitmap(correctedDiff, debug5);
 
         /**
          * threshholded and median blurred
@@ -366,6 +382,21 @@ public class JavaCameraViewManager extends SimpleViewManager<FrameLayout>
         Imgproc.threshold(correctedDiff, threshHolded, 70, 255, Imgproc.THRESH_BINARY + Imgproc.THRESH_OTSU);
         Imgproc.medianBlur(threshHolded, blurred, 5);
         Utils.matToBitmap(blurred, bmp);
+
+        Mat blurredrgb = new Mat();
+        Imgproc.cvtColor(blurred, blurredrgb, Imgproc.COLOR_GRAY2BGR);
+
+
+        for (int i = 0; i < 8; i++) {
+            Imgproc.line(blurredrgb, new Point(100*i, 0), new Point(100*i,799),
+                    new Scalar(0,255,0), 1);
+            Imgproc.line(blurredrgb, new Point(0, 100*i), new Point(799,100*i),
+                    new Scalar(0,255,0), 1);
+        }
+
+        Utils.matToBitmap(blurredrgb, bmp);
+
+
 
 
         //get color move coordinates
@@ -384,6 +415,7 @@ public class JavaCameraViewManager extends SimpleViewManager<FrameLayout>
                     else {
                         squares2.add(new Point(j,i));
                     }
+
                     j++;
                 }
                 if (found) {
@@ -561,27 +593,31 @@ public class JavaCameraViewManager extends SimpleViewManager<FrameLayout>
         Mat outImg = new Mat();
         if (goodMatchesList.size() >= 10) {
             String rs = "object found";
-//            MatOfDMatch goodMatches = new MatOfDMatch();
-//            goodMatches.fromList(goodMatchesList);
-//            Features2d.drawMatches(obj, objectKeyPoints, template, templateKeyPoints, goodMatches, outImg, RED, GREEN, new MatOfByte(), Features2d.NOT_DRAW_SINGLE_POINTS);
-//            File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-//            String filename = "featuresdetected.png";
-//            File file = new File(path, filename);
-//
-//            Boolean bool = null;
-//            filename = file.toString();
-//            bool = Imgcodecs.imwrite(filename, outImg);
-//
-//            if (bool == true) {
-//
-//                Log.d("opencv", "SUCCESS writing image to external storage");
-//            }
-//            else{
-//                Log.d("opencv", "Fail writing image to external storage");
-//            }
+            MatOfDMatch goodMatches = new MatOfDMatch();
+            goodMatches.fromList(goodMatchesList);
+            Features2d.drawMatches(obj, objectKeyPoints, template, templateKeyPoints, goodMatches, outImg, RED, GREEN, new MatOfByte(), Features2d.NOT_DRAW_SINGLE_POINTS);
+            File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+            String filename = "featuresdetected.png";
+            File file = new File(path, filename);
+
+            Boolean bool = null;
+            filename = file.toString();
+            bool = Imgcodecs.imwrite(filename, outImg);
+
+            if (bool == true) {
+
+                Log.d("opencv", "SUCCESS writing image to external storage");
+            }
+            else{
+                Log.d("opencv", "Fail writing image to external storage");
+            }
 
             certainty = goodMatchesList.size() / 15f;
+            Bitmap bmpoutimg = Bitmap.createBitmap(outImg.width(), outImg.height(), Bitmap.Config.ARGB_8888);
+            Utils.matToBitmap(outImg, bmpoutimg);
+
         }
+
         certainty = goodMatchesList.size() / 15f;
         System.out.println("done");
         return certainty;
@@ -709,7 +745,10 @@ public class JavaCameraViewManager extends SimpleViewManager<FrameLayout>
     public void findInnerCorner(Mat mat) {
         corners = new MatOfPoint2f();
         boolean found = Calib3d.findChessboardCorners(mat, new Size(7, 7), corners, Calib3d.CALIB_CB_ADAPTIVE_THRESH + Calib3d.CALIB_CB_NORMALIZE_IMAGE);
-       // Calib3d.drawChessboardCorners(mat, new Size(7,7), corners, found);
+        Calib3d.drawChessboardCorners(mRgba, new Size(7,7), corners, found);
+
+        Bitmap debug = Bitmap.createBitmap(mRgba.width(), mRgba.height(), Bitmap.Config.ARGB_8888);
+        Utils.matToBitmap(mRgba, debug);
 
         if(!found) return;
 
